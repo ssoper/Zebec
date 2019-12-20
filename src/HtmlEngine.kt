@@ -1,14 +1,15 @@
 interface Element {
-    fun render(): String
+    fun render(indent: Int = 0): String
 }
 
 abstract class Tag(val type: String): Element {
     var children: Array<Element> = emptyArray()
 
-    override fun render(): String {
-        var str = "<${type}>"
-        str += children.map { it.render() }.joinToString("\n")
-        str += "</${type}>"
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        var str = "${indentation}<${type}>\n"
+        str += children.map { it.render(indent + 2) }.joinToString("\n")
+        str += "\n${indentation}</${type}>"
 
         return str
     }
@@ -27,8 +28,9 @@ abstract class Tag(val type: String): Element {
 }
 
 class TagWithText(val type: String, val text: String): Element {
-    override fun render(): String {
-        return "<${type}>${text}</${type}>"
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        return "${indentation}<${type}>${text}</${type}>"
     }
 }
 
