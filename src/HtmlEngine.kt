@@ -20,7 +20,8 @@ abstract class Tag(val type: String): Element {
         return  tag
     }
 
-    fun tagWithText(tag: TagWithText) {
+    fun tagWithText(type: String, text: String) {
+        val tag = TagWithText(type, text)
         children += tag
     }
 }
@@ -37,12 +38,7 @@ class HTML: Tag("html") {
 }
 
 class Head: Tag("head") {
-    fun title(value: String): TagWithText {
-        val tag = TagWithText("title", value)
-        children += tag
-
-        return tag
-    }
+    fun title(text: String) = tagWithText("title", text)
 }
 
 class Body: Tag("body") {
@@ -51,7 +47,7 @@ class Body: Tag("body") {
 
 class DivTag: Tag("div") {
     fun p(init: PTag.() -> Unit) = initTag(PTag(), init)
-    fun p(text: String) = TagWithText("p", text)
+    fun p(text: String) = tagWithText("p", text)
 }
 
 class PTag: Tag("p")
@@ -71,6 +67,9 @@ fun main(args: Array<String>) {
             }
             body {
                 div {
+                    p {
+
+                    }
                     p("This is a paragraph")
                 }
             }
