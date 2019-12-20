@@ -10,9 +10,9 @@ abstract class Tag(type: String, attributes: TagAttributes? = null): Element(typ
 
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        var str = "${indentation}<${type}${tagAttributes}>\n"
-        str += children.map { it.render(indent + 2) }.joinToString("\n")
-        str += "\n${indentation}</${type}>"
+        var str = "$indentation<$type$tagAttributes>\n"
+        str += children.joinToString("\n") { it.render(indent + 2) }
+        str += "\n$indentation</$type>"
 
         return str
     }
@@ -31,15 +31,35 @@ abstract class Tag(type: String, attributes: TagAttributes? = null): Element(typ
 class TagWithText(type: String, val text: String, attributes: TagAttributes? = null): Element(type, attributes) {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        return "${indentation}<${type}${tagAttributes}>${text}</${type}>"
+        return "$indentation<$type$tagAttributes>$text</$type>"
     }
 }
 
 class TagSelfClosing(type: String, attributes: TagAttributes?): Element(type, attributes) {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        return "${indentation}<${type}${tagAttributes} />"
+        return "$indentation<$type$tagAttributes />"
     }
+}
+
+class TagComment(val comment: String): Element("comment") {
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        return "$indentation<!-- $comment -->"
+    }
+}
+
+class TagConditionalComment(val condition: String): Tag("comment") {
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        var str = "$indentation<!--[if $condition]>\n"
+        str += children.joinToString("\n") { it.render(indent + 2) }
+        str += "\n$indentation<![endif]-->"
+
+        return str
+    }
+
+    fun script(src: String) = addTag(TagWithText("script", "", mapOf("src" to src)))
 }
 
 class HTML: Tag("html") {
@@ -51,10 +71,13 @@ class Head: Tag("head") {
     fun title(text: String) = addTag(TagWithText("title", text))
     fun meta(attributes: TagAttributes?) = addTag(TagSelfClosing("meta", attributes))
     fun link(attributes: TagAttributes?) = addTag(TagSelfClosing("link", attributes))
+    fun comment(comment: String) = addTag(TagComment(comment))
+    fun ifComment(condition: String, init: TagConditionalComment.() -> Unit) = initTag(TagConditionalComment(condition), init)
 }
 
 class Body: Tag("body") {
     fun div(attributes: TagAttributes? = null, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
+    fun comment(comment: String) = addTag(TagComment(comment))
 }
 
 class DivTag(attributes: TagAttributes? = null): Tag("div", attributes) {
@@ -80,6 +103,11 @@ fun main(args: Array<String>) {
                 meta(mapOf("ICBM" to "39.0840, 77.1528"))
                 title("Sean Soper / Developer")
                 link(mapOf("rel" to "shortcut icon", "type" to "image/x-icon", "href" to "/favicon.ico"))
+                comment("HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries")
+                ifComment("lt IE 9") {
+                    script("https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js")
+                    script("https://oss.maxcdn.com/respond/1.4.2/respond.min.js")
+                }
             }
             body {
                 div(mapOf("class" to "site-wrapper")) {
