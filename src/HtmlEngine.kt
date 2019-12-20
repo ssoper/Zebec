@@ -2,12 +2,16 @@ interface Element {
     fun render(indent: Int = 0): String
 }
 
-abstract class Tag(val type: String): Element {
+typealias TagAttributes = Map<String, String>
+
+abstract class Tag(val type: String, val attributes: TagAttributes? = null): Element {
     var children: Array<Element> = emptyArray()
 
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        var str = "${indentation}<${type}>\n"
+        val attrs = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString(" ") ?: ""
+
+        var str = "${indentation}<${type}${attrs}>\n"
         str += children.map { it.render(indent + 2) }.joinToString("\n")
         str += "\n${indentation}</${type}>"
 
@@ -44,10 +48,10 @@ class Head: Tag("head") {
 }
 
 class Body: Tag("body") {
-    fun div(init: DivTag.() -> Unit) = initTag(DivTag(), init)
+    fun div(attributes: TagAttributes? = null, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
 }
 
-class DivTag: Tag("div") {
+class DivTag(attributes: TagAttributes? = null): Tag("div", attributes) {
     fun p(init: PTag.() -> Unit) = initTag(PTag(), init)
     fun p(text: String) = tagWithText("p", text)
 }
@@ -68,7 +72,7 @@ fun main(args: Array<String>) {
                 title("This is a web page title")
             }
             body {
-                div {
+                div(mapOf("class" to "site-wrapper")) {
                     p {
 
                     }
