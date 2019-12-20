@@ -1,17 +1,16 @@
-interface Element {
-    fun render(indent: Int = 0): String
+abstract class Element(val type: String, val attributes: TagAttributes? = null) {
+    abstract fun render(indent: Int = 0): String
+    val tagAttributes: String = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString(" ") ?: ""
 }
 
 typealias TagAttributes = Map<String, String>
 
-abstract class Tag(val type: String, val attributes: TagAttributes? = null): Element {
+abstract class Tag(type: String, attributes: TagAttributes? = null): Element(type, attributes) {
     var children: Array<Element> = emptyArray()
 
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        val attrs = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString(" ") ?: ""
-
-        var str = "${indentation}<${type}${attrs}>\n"
+        var str = "${indentation}<${type}${tagAttributes}>\n"
         str += children.map { it.render(indent + 2) }.joinToString("\n")
         str += "\n${indentation}</${type}>"
 
@@ -21,7 +20,6 @@ abstract class Tag(val type: String, val attributes: TagAttributes? = null): Ele
     fun <T: Tag>initTag(tag: T, init: T.() -> Unit): T {
         tag.init()
         children += tag
-
         return  tag
     }
 
@@ -31,7 +29,7 @@ abstract class Tag(val type: String, val attributes: TagAttributes? = null): Ele
     }
 }
 
-class TagWithText(val type: String, val text: String): Element {
+class TagWithText(type: String, val text: String, attributes: TagAttributes? = null): Element(type, attributes) {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
         return "${indentation}<${type}>${text}</${type}>"
@@ -61,7 +59,6 @@ class PTag: Tag("p")
 fun html(init: HTML.() -> Unit): HTML {
     val result = HTML()
     result.init()
-
     return result
 }
 
