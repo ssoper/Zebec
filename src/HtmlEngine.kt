@@ -1,6 +1,6 @@
 abstract class Element(val type: String, val attributes: TagAttributes? = null) {
     abstract fun render(indent: Int = 0): String
-    val tagAttributes: String = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString(" ") ?: ""
+    val tagAttributes: String = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString("") ?: ""
 }
 
 typealias TagAttributes = Map<String, String>
@@ -50,6 +50,7 @@ class HTML: Tag("html") {
 class Head: Tag("head") {
     fun title(text: String) = addTag(TagWithText("title", text))
     fun meta(attributes: TagAttributes?) = addTag(TagSelfClosing("meta", attributes))
+    fun link(attributes: TagAttributes?) = addTag(TagSelfClosing("link", attributes))
 }
 
 class Body: Tag("body") {
@@ -74,7 +75,11 @@ fun main(args: Array<String>) {
         html {
             head {
                 meta(mapOf("charset" to "utf-8"))
-                title("This is a web page title")
+                meta(mapOf("http-equiv" to "X-UA-Compatible", "content" to "IE=edge"))
+                meta(mapOf("viewport" to "width=device-width, initial-scale=1"))
+                meta(mapOf("ICBM" to "39.0840, 77.1528"))
+                title("Sean Soper / Developer")
+                link(mapOf("rel" to "shortcut icon", "type" to "image/x-icon", "href" to "/favicon.ico"))
             }
             body {
                 div(mapOf("class" to "site-wrapper")) {
