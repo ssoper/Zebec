@@ -20,11 +20,10 @@ abstract class Tag(type: String, attributes: TagAttributes? = null): Element(typ
     fun <T: Tag>initTag(tag: T, init: T.() -> Unit): T {
         tag.init()
         children += tag
-        return  tag
+        return tag
     }
 
-    fun tagWithText(type: String, text: String) {
-        val tag = TagWithText(type, text)
+    fun addTag(tag: Element) {
         children += tag
     }
 }
@@ -32,7 +31,14 @@ abstract class Tag(type: String, attributes: TagAttributes? = null): Element(typ
 class TagWithText(type: String, val text: String, attributes: TagAttributes? = null): Element(type, attributes) {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        return "${indentation}<${type}>${text}</${type}>"
+        return "${indentation}<${type}${tagAttributes}>${text}</${type}>"
+    }
+}
+
+class TagSelfClosing(type: String, attributes: TagAttributes?): Element(type, attributes) {
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        return "${indentation}<${type}${tagAttributes} />"
     }
 }
 
@@ -42,7 +48,8 @@ class HTML: Tag("html") {
 }
 
 class Head: Tag("head") {
-    fun title(text: String) = tagWithText("title", text)
+    fun title(text: String) = addTag(TagWithText("title", text))
+    fun meta(attributes: TagAttributes?) = addTag(TagSelfClosing("meta", attributes))
 }
 
 class Body: Tag("body") {
@@ -51,7 +58,7 @@ class Body: Tag("body") {
 
 class DivTag(attributes: TagAttributes? = null): Tag("div", attributes) {
     fun p(init: PTag.() -> Unit) = initTag(PTag(), init)
-    fun p(text: String) = tagWithText("p", text)
+    fun p(text: String) = addTag(TagWithText("p", text))
 }
 
 class PTag: Tag("p")
@@ -66,6 +73,7 @@ fun main(args: Array<String>) {
     val result =
         html {
             head {
+                meta(mapOf("charset" to "utf-8"))
                 title("This is a web page title")
             }
             body {
