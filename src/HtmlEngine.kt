@@ -5,6 +5,18 @@ abstract class Element(val type: String, val attributes: TagAttributes? = null) 
 
 typealias TagAttributes = Map<String, String>
 
+interface SupportsATag {
+    fun aTag(text: String, href: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
+        attributes?.also { entry ->
+            val finalAttrs = entry.toMutableMap()
+            finalAttrs["href"] = href
+            addTag(finalAttrs)
+        } ?: run {
+            addTag(mapOf("href" to href))
+        }
+    }
+}
+
 abstract class Tag(type: String, attributes: TagAttributes? = null): Element(type, attributes) {
     var children: Array<Element> = emptyArray()
 
@@ -85,16 +97,26 @@ class DivTag(attributes: TagAttributes?): Tag("div", attributes) {
     fun p(attributes: TagAttributes?, init: PTag.() -> Unit) = initTag(PTag(attributes), init)
     fun p(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("p", text, attributes))
     fun h1(text: String, attributes: TagAttributes?) = addTag(TagWithText("h1", text, attributes))
+    fun ul(attributes: TagAttributes? = null, init: UlTag.() -> Unit) = initTag(UlTag(attributes), init)
 }
 
-class PTag(attributes: TagAttributes?): Tag("p", attributes) {
-    fun a(text: String, href: String, attributes: TagAttributes?) {
-        attributes?.also { entry ->
-            val finalAttrs = entry.toMutableMap()
-            finalAttrs["href"] = href
-            addTag(TagWithText("a", text, finalAttrs))
-        } ?: run {
-            addTag(TagWithText("a", text, mapOf("href" to href)))
+class UlTag(attributes: TagAttributes?): Tag("ul", attributes) {
+    fun li(attributes: TagAttributes? = null, init: LiTag.() -> Unit) = initTag(LiTag(attributes), init)
+    fun li(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("li", text, attributes))
+}
+
+class LiTag(attributes: TagAttributes?): Tag("li", attributes), SupportsATag {
+    fun a(text: String, href: String, attributes: TagAttributes? = null) {
+        aTag(text, href, attributes) {
+            addTag(TagWithText("a", text, it))
+        }
+    }
+}
+
+class PTag(attributes: TagAttributes?): Tag("p", attributes), SupportsATag {
+    fun a(text: String, href: String, attributes: TagAttributes) {
+        aTag(text, href, attributes) {
+            addTag(TagWithText("a", text, it))
         }
     }
 }
@@ -135,12 +157,32 @@ fun main(args: Array<String>) {
                             div(mapOf("class" to "mastfoot")) {
                                 div(mapOf("class" to "inner")) {
                                     p("Connect")
-
+                                    ul(mapOf("class" to "list-inline")) {
+                                        li {
+                                            a("Email", "mailto:sean.soper@gmail.com")
+                                        }
+                                        li {
+                                            a("Mastodon", "//mastodon.technology/@ssoper")
+                                        }
+                                        li {
+                                            a("LinkedIn", "//linkedin.com/in/seansoper")
+                                        }
+                                        li {
+                                            a("Twitter", "//twitter.com/ssoper")
+                                        }
+                                        li {
+                                            a("CocoaHeads DC", "//cocoaheadsdc.org")
+                                        }
+                                        li(mapOf("class" to "hidden", "id" to "untapped")) {
+                                            a("Untappd", "//untappd.com/user/ssoper")
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                comment("Delay loading of CSS resource for Google PageSpeed optimizations")
             }
         }
 
