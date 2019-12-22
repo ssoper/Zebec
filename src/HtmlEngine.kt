@@ -76,16 +76,28 @@ class Head: Tag("head") {
 }
 
 class Body: Tag("body") {
-    fun div(attributes: TagAttributes? = null, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
+    fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
     fun comment(comment: String) = addTag(TagComment(comment))
 }
 
-class DivTag(attributes: TagAttributes? = null): Tag("div", attributes) {
-    fun p(init: PTag.() -> Unit) = initTag(PTag(), init)
-    fun p(text: String) = addTag(TagWithText("p", text))
+class DivTag(attributes: TagAttributes?): Tag("div", attributes) {
+    fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
+    fun p(attributes: TagAttributes?, init: PTag.() -> Unit) = initTag(PTag(attributes), init)
+    fun p(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("p", text, attributes))
+    fun h1(text: String, attributes: TagAttributes?) = addTag(TagWithText("h1", text, attributes))
 }
 
-class PTag: Tag("p")
+class PTag(attributes: TagAttributes?): Tag("p", attributes) {
+    fun a(text: String, href: String, attributes: TagAttributes?) {
+        attributes?.also { entry ->
+            val finalAttrs = entry.toMutableMap()
+            finalAttrs["href"] = href
+            addTag(TagWithText("a", text, finalAttrs))
+        } ?: run {
+            addTag(TagWithText("a", text, mapOf("href" to href)))
+        }
+    }
+}
 
 fun html(init: HTML.() -> Unit): HTML {
     val result = HTML()
@@ -111,10 +123,23 @@ fun main(args: Array<String>) {
             }
             body {
                 div(mapOf("class" to "site-wrapper")) {
-                    p {
+                    div(mapOf("class" to "site-wrapper-inner")) {
+                        div(mapOf("class" to "cover-container")) {
+                            div(mapOf("class" to "inner cover")) {
+                                h1("Leader, Developer<br />&amp; Technical Architect", mapOf("class" to "cover-heading"))
+                                p(mapOf("class" to "load")) {
+                                    a("Follow me on GitHub", "//github.com/ssoper", mapOf("class" to "btn btn-lg btn-primary"))
+                                    a("Download my CV","files/cv_for_sean_soper.pdf", mapOf("class" to "btn btn-lg btn-primary"))
+                                }
+                            }
+                            div(mapOf("class" to "mastfoot")) {
+                                div(mapOf("class" to "inner")) {
+                                    p("Connect")
 
+                                }
+                            }
+                        }
                     }
-                    p("This is a paragraph")
                 }
             }
         }
