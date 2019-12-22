@@ -7,13 +7,26 @@ typealias TagAttributes = Map<String, String>
 
 interface SupportsATag {
     fun aTag(text: String, href: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
-        attributes?.also { entry ->
-            val finalAttrs = entry.toMutableMap()
+        attributes?.also {
+            val finalAttrs = it.toMutableMap()
             finalAttrs["href"] = href
             addTag(finalAttrs)
         } ?: run {
             addTag(mapOf("href" to href))
         }
+    }
+}
+
+enum class LinkRelType(val value: String) {
+    Shortcut("short cut"),
+    Stylesheet("stylesheet")
+}
+
+interface SupportsLinkTag {
+    fun linkTag(relType: LinkRelType, attributes: TagAttributes, addTag: (TagAttributes) -> Unit) {
+        val finalAttrs = attributes.toMutableMap()
+        finalAttrs["rel"] = relType.value
+        addTag(finalAttrs)
     }
 }
 
@@ -79,17 +92,30 @@ class HTML: Tag("html") {
     fun body(init: Body.() -> Unit) = initTag(Body(), init)
 }
 
-class Head: Tag("head") {
+class Head: Tag("head"), SupportsLinkTag {
     fun title(text: String) = addTag(TagWithText("title", text))
-    fun meta(attributes: TagAttributes?) = addTag(TagSelfClosing("meta", attributes))
-    fun link(attributes: TagAttributes?) = addTag(TagSelfClosing("link", attributes))
+    fun meta(attributes: TagAttributes) = addTag(TagSelfClosing("meta", attributes))
     fun comment(comment: String) = addTag(TagComment(comment))
     fun ifComment(condition: String, init: TagConditionalComment.() -> Unit) = initTag(TagConditionalComment(condition), init)
+    fun link(relType: LinkRelType, attributes: TagAttributes) {
+        linkTag(relType, attributes) {
+            addTag(TagSelfClosing("link", it))
+        }
+    }
 }
 
 class Body: Tag("body") {
     fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
     fun comment(comment: String) = addTag(TagComment(comment))
+    fun noscript(attributes: TagAttributes?, init: NoScriptTag.() -> Unit) = initTag(NoScriptTag(attributes), init)
+}
+
+class NoScriptTag(attributes: TagAttributes?): Tag("noscript"), SupportsLinkTag {
+    fun link(relType: LinkRelType, attributes: TagAttributes) {
+        linkTag(relType, attributes) {
+            addTag(TagSelfClosing("link", it))
+        }
+    }
 }
 
 class DivTag(attributes: TagAttributes?): Tag("div", attributes) {
@@ -114,7 +140,7 @@ class LiTag(attributes: TagAttributes?): Tag("li", attributes), SupportsATag {
 }
 
 class PTag(attributes: TagAttributes?): Tag("p", attributes), SupportsATag {
-    fun a(text: String, href: String, attributes: TagAttributes) {
+    fun a(text: String, href: String, attributes: TagAttributes? = null) {
         aTag(text, href, attributes) {
             addTag(TagWithText("a", text, it))
         }
@@ -136,7 +162,7 @@ fun main(args: Array<String>) {
                 meta(mapOf("viewport" to "width=device-width, initial-scale=1"))
                 meta(mapOf("ICBM" to "39.0840, 77.1528"))
                 title("Sean Soper / Developer")
-                link(mapOf("rel" to "shortcut icon", "type" to "image/x-icon", "href" to "/favicon.ico"))
+                link(LinkRelType.Shortcut, mapOf("type" to "image/x-icon", "href" to "/favicon.ico"))
                 comment("HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries")
                 ifComment("lt IE 9") {
                     script("https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js")
@@ -183,6 +209,14 @@ fun main(args: Array<String>) {
                     }
                 }
                 comment("Delay loading of CSS resource for Google PageSpeed optimizations")
+                noscript(mapOf("id" to "deferred-styles")) {
+                    link(LinkRelType.Stylesheet, mapOf(
+                        "href" to "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
+                        "integrity" to "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
+                        "crossorigin" to "anonymous"))
+                    link(LinkRelType.Stylesheet, mapOf("href" to "css/cover.min.css"))
+                }
+
             }
         }
 
