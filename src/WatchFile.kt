@@ -21,14 +21,13 @@ fun registerPaths(paths: Array<String>): WatchService {
 
 fun main(args: Array<String>) {
 
-    val mine = arrayOf("sean", "is", "awesome")
-    val otherPaths = mine.sliceArray(IntRange(1, mine.count()-1))
-    mine.forEach { println(it) }
-    println("oh hai")
-    otherPaths.forEach { println(it) }
+    val paths = arrayOf(
+        "/Users/ssoper/workspace/StaticSite/",
+        "/Users/ssoper/workspace/StaticSite/css",
+        "/Users/ssoper/workspace/StaticSite/out"
+    )
 
-/*
-    println(path)
+    val watchService = registerPaths(paths)
 
     while (true) {
         println("watching")
@@ -40,5 +39,5 @@ fun main(args: Array<String>) {
         }
         key.reset()
 
-    }*/
+    }
 }
