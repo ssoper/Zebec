@@ -1,3 +1,5 @@
+package StaticSite
+
 abstract class Element(val type: String, val attributes: TagAttributes? = null) {
     abstract fun render(indent: Int = 0): String
     val tagAttributes: String = attributes?.map { " ${it.key}='${it.value}'" }?.joinToString("") ?: ""
@@ -153,7 +155,7 @@ fun html(init: HTML.() -> Unit): HTML {
     return result
 }
 
-fun main(args: Array<String>) {
+fun main() {
     val result =
         html {
             head {
@@ -222,3 +224,4 @@ fun main(args: Array<String>) {
 
     println(result.render())
 }
+
