@@ -1,11 +1,11 @@
+import kotlinx.coroutines.channels.Channel
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.WatchService
-import kotlinx.coroutines.*
 
-fun registerPaths(paths: Array<String>): List<Channel> {
+fun registerPaths(paths: Array<String>): List<Channel<String>> {
     return paths.map {
         val channel = Channel<String>()
         val watchService = FileSystems.getDefault().newWatchService()
@@ -24,7 +24,7 @@ fun registerPaths(paths: Array<String>): List<Channel> {
 
         }
 
-        return channel
+        return listOf(channel)
     }
 
 }
@@ -36,6 +36,5 @@ fun main(args: Array<String>) {
     )
 
     val watchService = registerPaths(paths)
-
 
 }

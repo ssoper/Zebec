@@ -1,4 +1,3 @@
-package StaticSite
 
 abstract class Element(val type: String, val attributes: TagAttributes? = null) {
     abstract fun render(indent: Int = 0): String
