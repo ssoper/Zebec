@@ -36,7 +36,7 @@ suspend fun createChannel(service: WatchService): Channel<String> {
     return channel
 }
 
-fun main() = runBlocking{
+fun main() = runBlocking {
 
     val paths = arrayOf(
         "/Users/ssoper/workspace/StaticSite/css",
