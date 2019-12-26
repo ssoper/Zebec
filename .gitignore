@@ -96,3 +96,8 @@ fabric.properties
 
 # custom
 META-INF/
+build/
+
+# temporary
+css/
+js/
