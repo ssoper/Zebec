@@ -109,6 +109,7 @@ class Body: Tag("body") {
     fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
     fun comment(comment: String) = addTag(TagComment(comment))
     fun noscript(attributes: TagAttributes?, init: NoScriptTag.() -> Unit) = initTag(NoScriptTag(attributes), init)
+    fun gaTag(site: String) = addTag(GoogleAnalyticsTag(site))
 }
 
 class NoScriptTag(attributes: TagAttributes?): Tag("noscript"), SupportsLinkTag {
@@ -145,6 +146,20 @@ class PTag(attributes: TagAttributes?): Tag("p", attributes), SupportsATag {
         aTag(text, href, attributes) {
             addTag(TagWithText("a", text, it))
         }
+    }
+}
+
+class GoogleAnalyticsTag(val site: String): Element("script") {
+    override fun render(indent: Int): String {
+        val indentation = " ".repeat(indent)
+        return "$indentation<!-- Google Analytics -->\n" +
+               "$indentation<script>\n" +
+               "$indentation(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" +
+               "$indentation(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n" +
+               "${indentation}m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n" +
+               "$indentation})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');\n" +
+               "${indentation}if (typeof(ga) === 'function') { ga('create', '$site', 'auto'); ga('send', 'pageview'); }\n"+
+               "$indentation</script>"
     }
 }
 
@@ -217,7 +232,7 @@ fun main() {
                         "crossorigin" to "anonymous"))
                     link(LinkRelType.Stylesheet, mapOf("href" to "css/cover.min.css"))
                 }
-
+                gaTag("UA-616637-1")
             }
         }
 
