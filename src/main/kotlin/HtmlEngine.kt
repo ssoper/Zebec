@@ -31,6 +31,18 @@ interface SupportsLinkTag {
     }
 }
 
+interface SupportsScriptTag {
+    fun scriptTag(src: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
+        attributes?.also {
+            val finalAttrs = it.toMutableMap()
+            finalAttrs["src"] = src
+            addTag(finalAttrs)
+        } ?: run {
+            addTag(mapOf("src" to src))
+        }
+    }
+}
+
 abstract class Tag(type: String, attributes: TagAttributes? = null): Element(type, attributes) {
     var children: Array<Element> = emptyArray()
 
@@ -75,7 +87,7 @@ class TagComment(val comment: String): Element("comment") {
     }
 }
 
-class TagConditionalComment(val condition: String): Tag("comment") {
+class TagConditionalComment(val condition: String): Tag("comment"), SupportsScriptTag {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
         var str = "$indentation<!--[if $condition]>\n"
@@ -85,7 +97,11 @@ class TagConditionalComment(val condition: String): Tag("comment") {
         return str
     }
 
-    fun script(src: String) = addTag(TagWithText("script", "", mapOf("src" to src)))
+    fun script(src: String) {
+        scriptTag(src) {
+            addTag(TagWithText("script", "", it))
+        }
+    }
 }
 
 class HTML: Tag("html") {
@@ -105,11 +121,16 @@ class Head: Tag("head"), SupportsLinkTag {
     }
 }
 
-class Body: Tag("body") {
+class Body: Tag("body"), SupportsScriptTag {
     fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
     fun comment(comment: String) = addTag(TagComment(comment))
     fun noscript(attributes: TagAttributes?, init: NoScriptTag.() -> Unit) = initTag(NoScriptTag(attributes), init)
     fun gaTag(site: String) = addTag(GoogleAnalyticsTag(site))
+    fun script(src: String, attributes: TagAttributes? = null) {
+        scriptTag(src, attributes) {
+            addTag(TagWithText("script", "", it))
+        }
+    }
 }
 
 class NoScriptTag(attributes: TagAttributes?): Tag("noscript"), SupportsLinkTag {
@@ -224,6 +245,12 @@ fun main() {
                         }
                     }
                 }
+                comment("jQuery (necessary for Bootstrap's JavaScript plugins)")
+                script("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
+                comment("Include all compiled plugins (below), or include individual files as needed")
+                script("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", mapOf(
+                    "integrity" to "sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS",
+                    "crossorigin" to "anonymous"))
                 comment("Delay loading of CSS resource for Google PageSpeed optimizations")
                 noscript(mapOf("id" to "deferred-styles")) {
                     link(LinkRelType.Stylesheet, mapOf(
@@ -231,7 +258,9 @@ fun main() {
                         "integrity" to "sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7",
                         "crossorigin" to "anonymous"))
                     link(LinkRelType.Stylesheet, mapOf("href" to "css/cover.min.css"))
+                    link(LinkRelType.Stylesheet, mapOf("href" to "css/theme.min.css"))
                 }
+                script("js/main.js")
                 gaTag("UA-616637-1")
             }
         }
