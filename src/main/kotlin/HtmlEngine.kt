@@ -173,8 +173,7 @@ class PTag(attributes: TagAttributes?): Tag("p", attributes), SupportsATag {
 class GoogleAnalyticsTag(val site: String): Element("script") {
     override fun render(indent: Int): String {
         val indentation = " ".repeat(indent)
-        return "$indentation<!-- Google Analytics -->\n" +
-               "$indentation<script>\n" +
+        return "$indentation<script>\n" +
                "$indentation(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" +
                "$indentation(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n" +
                "${indentation}m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n" +
@@ -247,11 +246,11 @@ fun main() {
                 }
                 comment("jQuery (necessary for Bootstrap's JavaScript plugins)")
                 script("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
-                comment("Include all compiled plugins (below), or include individual files as needed")
+                comment("Bootstrap")
                 script("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", mapOf(
                     "integrity" to "sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS",
                     "crossorigin" to "anonymous"))
-                comment("Delay loading of CSS resource for Google PageSpeed optimizations")
+                comment("Delay loading of some assets for Google PageSpeed optimizations")
                 noscript(mapOf("id" to "deferred-styles")) {
                     link(LinkRelType.Stylesheet, mapOf(
                         "href" to "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
@@ -261,6 +260,7 @@ fun main() {
                     link(LinkRelType.Stylesheet, mapOf("href" to "css/theme.min.css"))
                 }
                 script("js/main.js")
+                comment("Google Analytics")
                 gaTag("UA-616637-1")
             }
         }
