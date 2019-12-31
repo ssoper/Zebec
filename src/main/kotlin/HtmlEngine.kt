@@ -19,7 +19,7 @@ interface SupportsATag {
 }
 
 enum class LinkRelType(val value: String) {
-    Shortcut("short cut"),
+    Shortcut("shortcut icon"),
     Stylesheet("stylesheet")
 }
 
@@ -104,7 +104,13 @@ class TagConditionalComment(val condition: String): Tag("comment"), SupportsScri
     }
 }
 
-class HTML: Tag("html") {
+class HTML(language: String): Tag("html", mapOf("lang" to language)) {
+
+    override fun render(indent: Int): String {
+        val content = super.render(indent)
+        return "<!DOCTYPE html>\n$content"
+    }
+
     fun head(init: Head.() -> Unit) = initTag(Head(), init)
     fun body(init: Body.() -> Unit) = initTag(Body(), init)
 }
@@ -183,8 +189,8 @@ class GoogleAnalyticsTag(val site: String): Element("script") {
     }
 }
 
-fun html(init: HTML.() -> Unit): HTML {
-    val result = HTML()
+fun html(language: String = "en", init: HTML.() -> Unit): HTML {
+    val result = HTML(language)
     result.init()
     return result
 }
@@ -195,8 +201,8 @@ fun main() {
             head {
                 meta(mapOf("charset" to "utf-8"))
                 meta(mapOf("http-equiv" to "X-UA-Compatible", "content" to "IE=edge"))
-                meta(mapOf("viewport" to "width=device-width, initial-scale=1"))
-                meta(mapOf("ICBM" to "39.0840, 77.1528"))
+                meta(mapOf("name" to "viewport", "content" to "width=device-width, initial-scale=1"))
+                meta(mapOf("name" to "ICBM", "content" to "39.0840, 77.1528"))
                 title("Sean Soper / Developer")
                 link(LinkRelType.Shortcut, mapOf("type" to "image/x-icon", "href" to "/favicon.ico"))
                 comment("HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries")

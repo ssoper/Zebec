@@ -12,3 +12,4 @@ Static site generator using a common sense DSL
     * Any changes to DSL file generates new HTML file
     * Any changes to linked assets (CSS, JS) generates new compressed files
     * Localhost automatically refreshes page
+    * Service encapsulated in single JAR file
