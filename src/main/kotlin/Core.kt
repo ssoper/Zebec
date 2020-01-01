@@ -1,6 +1,5 @@
-package com.seansoper.xepec
+package com.seansoper.zebec
 
-import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.system.exitProcess
