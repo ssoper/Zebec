@@ -2,16 +2,19 @@ package com.seansoper.zebec
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.WatchService
 
-class WatchFile(val paths: List<Path>, val extensions: List<String>) {
+class WatchFile(paths: List<Path>, val extensions: List<String>) {
     val watchService: WatchService = FileSystems.getDefault().newWatchService()
+    var paths = setOf<Path>()
 
     init {
-        paths.forEach {
+        this.paths = getSubdirectories(paths)
+        this.paths.forEach {
             it.register(watchService, ENTRY_MODIFY)
         }
     }
@@ -41,4 +44,15 @@ class WatchFile(val paths: List<Path>, val extensions: List<String>) {
         return extensions.any { path.toString().toLowerCase().endsWith(".${it.toLowerCase()}") }
     }
 
+    private fun getSubdirectories(paths: List<Path>): Set<Path> {
+        val results = mutableSetOf<Path>()
+
+        paths.forEach {
+            File(it.toString()).walk().filter { it.isDirectory }.forEach {
+                results.add(it.toPath())
+            }
+        }
+
+        return results
+    }
 }

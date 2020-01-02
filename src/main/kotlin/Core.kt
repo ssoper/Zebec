@@ -39,12 +39,14 @@ object Core {
 
         if (verbose) {
             println("Serving at localhost:$port")
-            println("Watching ${paths.joinToString()}")
+            watch.paths.forEach { println("Watching $it") }
             println("Filtering on files with extensions ${extensions.joinToString()}")
         }
 
         while (true) {
-            println("Change detected at ${channel.receive()}")
+            if (verbose) {
+                println("Change detected at ${channel.receive()}")
+            }
         }
     }
 
