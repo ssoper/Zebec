@@ -1,5 +1,7 @@
 package com.seansoper.zebec
 
+import kotlinx.coroutines.runBlocking
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.system.exitProcess
@@ -8,25 +10,39 @@ object Core {
 
     const val DefaultPort = 8080
 
-    @JvmStatic fun main(args: Array<String>) {
+    @JvmStatic fun main(args: Array<String>) = runBlocking {
         if (shouldShowHelp(args)) {
             showHelp()
             exitProcess(0)
         }
 
-        val watchPaths = getWatchPaths(args)
+        val paths = getWatchPaths(args)
 
-        if (watchPaths.isEmpty()) {
+        if (paths.isEmpty()) {
             println("ERROR: No watch paths specified\n")
             showHelp()
             exitProcess(1)
         }
 
         val port = getPort(args)
+        val watch = try {
+            WatchFile(paths)
+        } catch (exception: NoSuchFileException) {
+            println("ERROR: watch argument invalid for ${exception.file}")
+            exitProcess(1)
+        }
 
-        println("***")
-        println(watchPaths)
-        println(port)
+        val channel = watch.createChannel()
+        val verbose = getVerbose(args)
+
+        if (verbose) {
+            println("Serving at localhost:$port")
+            println("Watching ${paths.joinToString()}")
+        }
+
+        while (true) {
+            println("Path ${channel.receive()}")
+        }
     }
 
     private fun<T: Any> parseArguments(regex: Regex, args: Array<String>, transform: (String) -> T): List<T> {
@@ -43,6 +59,11 @@ object Core {
         }
 
         return args.mapNotNull(match)
+    }
+
+    private fun getVerbose(args: Array<String>): Boolean {
+        val regex = Regex("^-verbose=(\\w+)")
+        return parseArguments(regex, args) { it == "true" }.isNotEmpty()
     }
 
     private fun getPort(args: Array<String>): Int {
@@ -74,6 +95,7 @@ object Core {
                 -help                   Show documentation
                 -watch="dir/to/watch"   Relative directory path to watch for file changes, each specified path should have its own `-watch` (Required)
                 -port=8080              Port for server, default is 8080
+                -verbose=true           Show debugging output
         """.trimIndent()
         println(str)
     }
