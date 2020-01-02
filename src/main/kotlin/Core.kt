@@ -25,8 +25,10 @@ object Core {
         }
 
         val port = getPort(args)
+        val extensions = getExtension(args)
+
         val watch = try {
-            WatchFile(paths)
+            WatchFile(paths, extensions)
         } catch (exception: NoSuchFileException) {
             println("ERROR: watch argument invalid for ${exception.file}")
             exitProcess(1)
@@ -38,10 +40,11 @@ object Core {
         if (verbose) {
             println("Serving at localhost:$port")
             println("Watching ${paths.joinToString()}")
+            println("Filtering on files with extensions ${extensions.joinToString()}")
         }
 
         while (true) {
-            println("Path ${channel.receive()}")
+            println("Change detected at ${channel.receive()}")
         }
     }
 
@@ -59,6 +62,17 @@ object Core {
         }
 
         return args.mapNotNull(match)
+    }
+
+    private fun getExtension(args: Array<String>): List<String> {
+        val regex = Regex("^-extension=(\\w{3,4})")
+        val extensions = parseArguments(regex, args) { it }
+
+        return if (extensions.isEmpty()) {
+            listOf("css", "js", "html")
+        } else {
+            extensions
+        }
     }
 
     private fun getVerbose(args: Array<String>): Boolean {
@@ -94,6 +108,7 @@ object Core {
 
                 -help                   Show documentation
                 -watch="dir/to/watch"   Relative directory path to watch for file changes, each specified path should have its own `-watch` (Required)
+                -extension=filetype     File type (extension) to filter on, defaults are css, js and html
                 -port=8080              Port for server, default is 8080
                 -verbose=true           Show debugging output
         """.trimIndent()

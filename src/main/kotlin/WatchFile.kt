@@ -7,7 +7,7 @@ import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.WatchService
 
-class WatchFile(val paths: List<Path>) {
+class WatchFile(val paths: List<Path>, val extensions: List<String>) {
     val watchService: WatchService = FileSystems.getDefault().newWatchService()
 
     init {
@@ -25,14 +25,20 @@ class WatchFile(val paths: List<Path>) {
                 val key = watchService.take()
                 val dirPath = key.watchable() as? Path ?: break
                 key.pollEvents().forEach {
-                    val eventPath = dirPath.resolve(it.context() as Path)
-                    channel.send(eventPath.toString())
+                    val path = dirPath.resolve(it.context() as Path)
+                    if (matches(path)) {
+                        channel.send(path.toString())
+                    }
                 }
                 key.reset()
             }
         }
 
         return channel
+    }
+
+    private fun matches(path: Path): Boolean {
+        return extensions.any { path.toString().toLowerCase().endsWith(".${it.toLowerCase()}") }
     }
 
 }
