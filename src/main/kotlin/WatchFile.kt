@@ -10,7 +10,7 @@ import java.nio.file.WatchService
 
 class WatchFile(paths: List<Path>, val extensions: List<String>) {
     val watchService: WatchService = FileSystems.getDefault().newWatchService()
-    var paths = setOf<Path>()
+    val paths: Set<Path>
 
     init {
         this.paths = getSubdirectories(paths)
@@ -19,8 +19,10 @@ class WatchFile(paths: List<Path>, val extensions: List<String>) {
         }
     }
 
-    suspend fun createChannel(): Channel<String> {
-        val channel = Channel<String>()
+    data class ChangedFile(val path: Path, val extension: String)
+
+    suspend fun createChannel(): Channel<ChangedFile> {
+        val channel = Channel<ChangedFile>()
         val scope: CoroutineScope = GlobalScope
 
         scope.launch(Dispatchers.IO) {
@@ -29,8 +31,8 @@ class WatchFile(paths: List<Path>, val extensions: List<String>) {
                 val dirPath = key.watchable() as? Path ?: break
                 key.pollEvents().forEach {
                     val path = dirPath.resolve(it.context() as Path)
-                    if (matches(path)) {
-                        channel.send(path.toString())
+                    matches(path)?.let { extension ->
+                        channel.send(ChangedFile(path, extension))
                     }
                 }
                 key.reset()
@@ -40,8 +42,8 @@ class WatchFile(paths: List<Path>, val extensions: List<String>) {
         return channel
     }
 
-    private fun matches(path: Path): Boolean {
-        return extensions.any { path.toString().toLowerCase().endsWith(".${it.toLowerCase()}") }
+    private fun matches(path: Path): String? {
+        return extensions.firstOrNull { path.toString().toLowerCase().endsWith(".${it.toLowerCase()}") }
     }
 
     private fun getSubdirectories(paths: List<Path>): Set<Path> {
