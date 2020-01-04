@@ -6,9 +6,8 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.math.abs
 import kotlin.system.exitProcess
-
+import javax.script.ScriptEngineManager
 
 object Core {
 
@@ -57,32 +56,55 @@ object Core {
             }
 
             process(changed, source, dest) { filename, extension, content ->
-                val fullname = "$filename.$extension.compiled"
-                ProcessedFile(content, fullname)
+                if (extension == "ktml") {
+                    val html = processHtml(content)
+                    ProcessedFile(html, "$filename.html")
+                } else {
+                    ProcessedFile(content, "$filename.$extension.compiled")
+                }
             }
         }
     }
 
     private data class ProcessedFile(val content: String, val fullname: String)
+    private data class ProcessedDirs(val dir: Path, val parentDir: File)
+
+    private fun processHtml(content: String): String {
+        val engine = ScriptEngineManager().getEngineByExtension("kts")
+
+        // Because bindings are wonky
+        val updatedContent = "import com.seansoper.zebec.HtmlEngine\n$content".
+            replace("html ", "HtmlEngine().html ").
+            replace("LinkRelType", "HtmlEngine.LinkRelType")
+
+        val compiled = engine.eval(updatedContent) as HtmlEngine.HTML
+        return compiled.render()
+    }
+
+    private fun getDirectories(changedPath: Path, source: Path, dest: Path): ProcessedDirs? {
+        val destDir = changedPath.toString().split(source.toString()).elementAtOrNull(1) ?: return null
+        val dir = Paths.get(BasePath, dest.toString(), destDir)
+        val parentDir = File(dir.toString().replace("/./", "/")).parentFile
+
+        return ProcessedDirs(dir, parentDir)
+    }
 
     private fun process(changed: WatchFile.ChangedFile, source: Path, dest: Path, transform: (filename: String, extension: String, content: String) -> ProcessedFile) {
-        val destDir = changed.path.toString().split(source.toString()).elementAtOrNull(1) ?: return
-        val finalDest = Paths.get(BasePath, dest.toString(), destDir)
-        val filename = finalDest.fileName.toString().split(".").firstOrNull() ?: return
+        val (dir, parentDir) = getDirectories(changed.path, source, dest) ?: return
+        val filename = dir.fileName.toString().split(".").firstOrNull() ?: return
         val content = File(changed.path.toString()).readText()
         val result = transform(filename, changed.extension, content)
-        val finalDestParentDir = File(finalDest.toString().replace("/./", "/")).parentFile
 
-        if (!finalDestParentDir.exists()) {
-            finalDestParentDir.mkdirs()
+        if (!parentDir.exists()) {
+            parentDir.mkdirs()
         }
 
-        val path = Paths.get(finalDestParentDir.toString(), result.fullname)
+        val path = Paths.get(parentDir.toString(), result.fullname)
 
         if (Verbose) {
             val origSize = humanReadableByteCount(content.length.toLong())
             val newSize = humanReadableByteCount(result.content.length.toLong())
-            println("Compiled ${finalDest.fileName} ($origSize) to $path ($newSize)")
+            println("Compiled ${dir.fileName} ($origSize) to $path ($newSize)")
         }
 
         Files.write(path, result.content.toByteArray())
