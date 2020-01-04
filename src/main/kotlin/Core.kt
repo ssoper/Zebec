@@ -8,6 +8,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.system.exitProcess
 import javax.script.ScriptEngineManager
+import javax.script.ScriptException
 
 object Core {
 
@@ -57,8 +58,9 @@ object Core {
 
             process(changed, source, dest) { filename, extension, content ->
                 if (extension == "ktml") {
-                    val html = processHtml(content)
-                    ProcessedFile(html, "$filename.html")
+                    processHtml(content)?.let {
+                        ProcessedFile(it, "$filename.html")
+                    }
                 } else {
                     ProcessedFile(content, "$filename.$extension.compiled")
                 }
@@ -69,7 +71,7 @@ object Core {
     private data class ProcessedFile(val content: String, val fullname: String)
     private data class ProcessedDirs(val dir: Path, val parentDir: File)
 
-    private fun processHtml(content: String): String {
+    private fun processHtml(content: String): String? {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
 
         // Because bindings are wonky
@@ -77,8 +79,16 @@ object Core {
             replace("html ", "HtmlEngine().html ").
             replace("LinkRelType", "HtmlEngine.LinkRelType")
 
-        val compiled = engine.eval(updatedContent) as HtmlEngine.HTML
-        return compiled.render()
+        return try {
+            val compiled = engine.eval(updatedContent) as HtmlEngine.HTML
+            compiled.render()
+        } catch (exception: ScriptException) {
+            if (Verbose) {
+                println("ERROR: Code didn’t compile")
+            }
+
+            null
+        }
     }
 
     private fun getDirectories(changedPath: Path, source: Path, dest: Path): ProcessedDirs? {
@@ -89,11 +99,11 @@ object Core {
         return ProcessedDirs(dir, parentDir)
     }
 
-    private fun process(changed: WatchFile.ChangedFile, source: Path, dest: Path, transform: (filename: String, extension: String, content: String) -> ProcessedFile) {
+    private fun process(changed: WatchFile.ChangedFile, source: Path, dest: Path, transform: (filename: String, extension: String, content: String) -> ProcessedFile?) {
         val (dir, parentDir) = getDirectories(changed.path, source, dest) ?: return
         val filename = dir.fileName.toString().split(".").firstOrNull() ?: return
         val content = File(changed.path.toString()).readText()
-        val result = transform(filename, changed.extension, content)
+        val result = transform(filename, changed.extension, content) ?: return
 
         if (!parentDir.exists()) {
             parentDir.mkdirs()
