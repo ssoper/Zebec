@@ -17,6 +17,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-script-runtime:${jsr223WorkingVersion}"
     implementation "org.jetbrains.kotlin:kotlin-compiler-embeddable:${jsr223WorkingVersion}"
     implementation "org.jetbrains.kotlin:kotlin-script-util:${jsr223WorkingVersion}"
+    compile files("src/main/libs/yuicompressor-2.4.8.jar")
 }
 
 compileKotlin {

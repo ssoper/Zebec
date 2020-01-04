@@ -6,9 +6,12 @@ import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.system.exitProcess
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
+import kotlin.system.exitProcess
+import com.yahoo.platform.yui.compressor.JavaScriptCompressor
+import org.mozilla.javascript.ErrorReporter
+import org.mozilla.javascript.EvaluatorException
 
 object Core {
 
@@ -61,8 +64,16 @@ object Core {
                     processHtml(content)?.let {
                         ProcessedFile(it, "$filename.html")
                     }
+                } else if (extension == "js") {
+                    processJavascript(content)?.let {
+                        ProcessedFile(it,"$filename.min.js")
+                    }
                 } else {
-                    ProcessedFile(content, "$filename.$extension.compiled")
+                    if (Verbose) {
+                        println("ERROR: Unsupported content type $extension")
+                    }
+
+                    null
                 }
             }
         }
@@ -70,6 +81,68 @@ object Core {
 
     private data class ProcessedFile(val content: String, val fullname: String)
     private data class ProcessedDirs(val dir: Path, val parentDir: File)
+
+    object YuiCompressorReporter: ErrorReporter {
+        private fun createMessage(message: String?, source: String?, line: Int, lineOffset: Int): String {
+            var errorMessage = "YuiCompressor: ${message ?: "Error encountered"}"
+            source?.let { errorMessage += " ($this)" }
+            errorMessage += " line: $line/$lineOffset"
+
+            return errorMessage
+        }
+
+        override fun warning(message: String?, source: String?, line: Int, lineSource: String?, lineOffset: Int) {
+            println(createMessage(message, source, line, lineOffset))
+        }
+
+        override fun error(message: String?, source: String?, line: Int, lineSource: String?, lineOffset: Int) {
+            println(createMessage(message, source, line, lineOffset))
+        }
+
+        override fun runtimeError(message: String?, source: String?, line: Int, lineSource: String?, lineOffset: Int): EvaluatorException {
+            return EvaluatorException(createMessage(message, source, line, lineOffset))
+        }
+    }
+
+    object YuiOptions {
+        val lineBreakPos = -1
+        val munge = true
+        val verbose = Verbose
+        val preserveAllSemiColons = false
+        val disableOptimizations = false
+    }
+
+    private fun processJavascript(content: String): String? {
+        val tmpName = java.util.UUID.randomUUID()
+        val pathname = "/tmp/$tmpName.min.js"
+
+        return try {
+            val compressor = JavaScriptCompressor(content.reader(), YuiCompressorReporter)
+            val output = File(pathname)
+
+            output.writer().use {
+                compressor.compress(
+                    it,
+                    YuiOptions.lineBreakPos,
+                    YuiOptions.munge,
+                    YuiOptions.verbose,
+                    YuiOptions.preserveAllSemiColons,
+                    YuiOptions.disableOptimizations
+                )
+            }
+
+            File(pathname).readText()
+        } catch (exception: Exception) {
+            println("YuiCompressor: $exception")
+            null
+        } finally {
+            Paths.get(pathname).apply {
+                if (Files.exists(this)) {
+                    Files.delete(this)
+                }
+            }
+        }
+    }
 
     private fun processHtml(content: String): String? {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
