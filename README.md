@@ -20,3 +20,4 @@ Static site generator using a common sense DSL
 * Blog
 * Site index
 * Keywords
+* Templating

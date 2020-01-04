@@ -3,32 +3,32 @@ package com.seansoper.zebec
 import kotlinx.coroutines.runBlocking
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.system.exitProcess
 
 object Core {
 
-    private const val DefaultPort = 8080
-    private val BasePath = System.getProperty("user.dir")
-    private var Verbose = false
-
     @JvmStatic fun main(args: Array<String>) = runBlocking {
-        if (shouldShowHelp(args)) {
-            showHelp()
+        val cli = CommandLineParser(args)
+
+        if (cli.shouldShowHelp) {
+            cli.showHelp()
             exitProcess(0)
         }
 
-        val source = getPath("source", args) ?: run {
-            println("ERROR: No source path specified\n")
-            showHelp()
+        val (source, dest, port, extensions, verbose) = cli.parse()?.let {
+            it
+        } ?: run {
+            val message = cli.errorMessage ?: "Error reading from command line"
+            println(message)
+            cli.showHelp()
             exitProcess(1)
         }
 
-        val dest = getPath("dest", args) ?: Paths.get(BasePath,".")
+        println("Serving at localhost:$port")
+        watchFiles(source, dest, extensions, verbose)
+    }
 
-        val port = getPort(args)
-        val extensions = getExtension(args)
-
+    suspend fun watchFiles(source: Path, dest: Path, extensions: List<String>, verbose: Boolean) {
         val watch = try {
             WatchFile(listOf(source), extensions)
         } catch (exception: NoSuchFileException) {
@@ -37,10 +37,8 @@ object Core {
         }
 
         val channel = watch.createChannel()
-        Verbose = getVerbose(args)
 
-        if (Verbose) {
-            println("Serving at localhost:$port")
+        if (verbose) {
             watch.paths.forEach { println("Watching $it") }
             println("Filtering on files with extensions ${extensions.joinToString()}")
         }
@@ -48,81 +46,17 @@ object Core {
         while (true) {
             val changed = channel.receive()
 
-            if (Verbose) {
+            if (verbose) {
                 println("Change detected at ${changed.path}")
             }
 
-            EventProcessor(changed, source, dest, Verbose).process {
-                if (Verbose) {
+            EventProcessor(changed, source, dest, verbose).process {
+                if (verbose) {
                     it?.let {
-                        println("Successfully compiled to $it")
+                        println("Copied to $it")
                     } ?: println("Failed to compile")
                 }
             }
         }
-    }
-
-    private fun<T: Any> parseArguments(regex: Regex, args: Array<String>, transform: (String) -> T): List<T> {
-        val match = fun (str: String): T? {
-            return regex.find(str)?.let {
-                if (it.groups.count() < 2) {
-                    return null
-                }
-
-                it.groups[1]?.let {
-                    return transform(it.value.removeSurrounding("\"").removeSurrounding("'"))
-                }
-            }
-        }
-
-        return args.mapNotNull(match)
-    }
-
-    private fun getExtension(args: Array<String>): List<String> {
-        val regex = Regex("^-extension=(\\w{3,4})")
-        val extensions = parseArguments(regex, args) { it }
-
-        return if (extensions.isEmpty()) {
-            listOf("css", "js", "ktml")
-        } else {
-            extensions
-        }
-    }
-
-    private fun getVerbose(args: Array<String>): Boolean {
-        val regex = Regex("^-verbose=(\\w+)")
-        return parseArguments(regex, args) { it == "true" }.isNotEmpty()
-    }
-
-    private fun getPort(args: Array<String>): Int {
-        val regex = Regex("^-port=(\\d{2,5})")
-        val results = parseArguments(regex, args) { it.toInt() }
-
-        return results.firstOrNull() ?: DefaultPort
-    }
-
-    private fun getPath(type: String, args: Array<String>): Path? {
-        val regex = Regex("^-${type}=(.*)")
-
-        return parseArguments(regex, args) { Paths.get(BasePath, it) }.firstOrNull()
-    }
-
-    private fun shouldShowHelp(args: Array<String>): Boolean {
-        return args.any { it == "-help" }
-    }
-
-    private fun showHelp() {
-        val str = """
-            Arguments
-
-                -help                   Show documentation
-                -source=directory       Relative directory path for source of project files (Required)
-                -dest=directory         Relative directory path for destination of compiled files, default is current working directory
-                -extension=filetype     File extension to filter on. Each specified file type should have its own `-extension` argument.
-                                        Defaults are css, js and ktml.
-                -port=8080              Port for server, default is 8080
-                -verbose=true           Show debugging output
-        """.trimIndent()
-        println(str)
     }
 }

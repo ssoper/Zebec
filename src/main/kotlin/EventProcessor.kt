@@ -164,7 +164,7 @@ class EventProcessor(val changed: WatchFile.ChangedFile, val source: Path, val d
         if (verbose) {
             val origSize = humanReadableByteCount(content.length.toLong())
             val newSize = humanReadableByteCount(result.content.length.toLong())
-            println("Compiled ${dir.fileName} ($origSize) to $path ($newSize)")
+            println("Compiled ${dir.fileName}, $origSize → $newSize")
         }
 
         Files.write(path, result.content.toByteArray())
