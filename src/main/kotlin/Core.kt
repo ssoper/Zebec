@@ -18,8 +18,7 @@ object Core {
         val (source, dest, port, extensions, verbose) = cli.parse()?.let {
             it
         } ?: run {
-            val message = cli.errorMessage ?: "Error reading from command line"
-            println(message)
+            println(cli.errorMessage)
             cli.showHelp()
             exitProcess(1)
         }

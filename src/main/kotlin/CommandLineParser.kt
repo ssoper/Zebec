@@ -8,7 +8,7 @@ class CommandLineParser(private val args: Array<String>,
                         private val defaultPort: Int = 8080) {
 
     val shouldShowHelp: Boolean = args.any { it == "-help" }
-    var errorMessage: String? = null
+    var errorMessage = "Error reading from command line"
 
     data class Parsed(val source: Path, val dest: Path, val port: Int, val extensions: List<String>, val verbose: Boolean)
 
