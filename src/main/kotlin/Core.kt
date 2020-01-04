@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.yahoo.platform.yui.compressor.CssCompressor
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.nio.file.Files
@@ -60,20 +61,20 @@ object Core {
             }
 
             process(changed, source, dest) { filename, extension, content ->
-                if (extension == "ktml") {
-                    processHtml(content)?.let {
+                when (extension) {
+                    "ktml" -> processHtml(content)?.let {
                         ProcessedFile(it, "$filename.html")
                     }
-                } else if (extension == "js") {
-                    processJavascript(content)?.let {
-                        ProcessedFile(it,"$filename.min.js")
+                    "js", "css" -> processScript(content, extension)?.let {
+                        ProcessedFile(it,"$filename.min.$extension")
                     }
-                } else {
-                    if (Verbose) {
-                        println("ERROR: Unsupported content type $extension")
-                    }
+                    else -> {
+                        if (Verbose) {
+                            println("ERROR: Unsupported content type $extension")
+                        }
 
-                    null
+                        null
+                    }
                 }
             }
         }
@@ -112,26 +113,16 @@ object Core {
         val disableOptimizations = false
     }
 
-    private fun processJavascript(content: String): String? {
+    private fun processScript(content: String, extension: String): String? {
         val tmpName = java.util.UUID.randomUUID()
-        val pathname = "/tmp/$tmpName.min.js"
+        val pathname = "/tmp/$tmpName.min.$extension"
 
         return try {
-            val compressor = JavaScriptCompressor(content.reader(), YuiCompressorReporter)
-            val output = File(pathname)
-
-            output.writer().use {
-                compressor.compress(
-                    it,
-                    YuiOptions.lineBreakPos,
-                    YuiOptions.munge,
-                    YuiOptions.verbose,
-                    YuiOptions.preserveAllSemiColons,
-                    YuiOptions.disableOptimizations
-                )
+            if (extension == "js") {
+                processJavascript(content, pathname)
+            } else {
+                processStylesheet(content, pathname)
             }
-
-            File(pathname).readText()
         } catch (exception: Exception) {
             println("YuiCompressor: $exception")
             null
@@ -142,6 +133,38 @@ object Core {
                 }
             }
         }
+    }
+
+    private fun processJavascript(content: String, pathname: String): String {
+        val compressor = JavaScriptCompressor(content.reader(), YuiCompressorReporter)
+        val output = File(pathname)
+
+        output.writer().use {
+            compressor.compress(
+                it,
+                YuiOptions.lineBreakPos,
+                YuiOptions.munge,
+                YuiOptions.verbose,
+                YuiOptions.preserveAllSemiColons,
+                YuiOptions.disableOptimizations
+            )
+        }
+
+        return File(pathname).readText()
+    }
+
+    private fun processStylesheet(content: String, pathname: String): String {
+        val compressor = CssCompressor(content.reader())
+        val output = File(pathname)
+
+        output.writer().use {
+            compressor.compress(
+                it,
+                YuiOptions.lineBreakPos
+            )
+        }
+
+        return File(pathname).readText()
     }
 
     private fun processHtml(content: String): String? {
