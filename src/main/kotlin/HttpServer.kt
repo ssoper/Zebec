@@ -45,7 +45,7 @@ class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
                 response.println(content)
             }
         } ?: run {
-            it.responseHeaders.add("Content-type", "text/plain")
+            it.responseHeaders.add("Content-Type", "text/plain")
             it.sendResponseHeaders(404, 0)
             PrintWriter(it.responseBody).use { response ->
                 response.println("404/Not Found")

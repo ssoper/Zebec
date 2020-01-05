@@ -144,7 +144,7 @@ class HtmlEngine {
         }
     }
 
-    class NoScriptTag(attributes: TagAttributes?) : Tag("noscript"), SupportsLinkTag {
+    class NoScriptTag(attributes: TagAttributes?) : Tag("noscript", attributes), SupportsLinkTag {
         fun link(relType: LinkRelType, attributes: TagAttributes) {
             linkTag(relType, attributes) {
                 addTag(TagSelfClosing("link", it))
