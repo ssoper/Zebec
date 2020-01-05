@@ -7,7 +7,7 @@ import kotlin.system.exitProcess
 
 object Core {
 
-    @JvmStatic fun main(args: Array<String>) = runBlocking {
+    @JvmStatic fun main(args: Array<String>) {
         val cli = CommandLineParser(args)
 
         if (cli.shouldShowHelp) {
@@ -23,8 +23,11 @@ object Core {
             exitProcess(1)
         }
 
-        println("Serving at localhost:$port")
-        watchFiles(source, dest, extensions, verbose)
+        HttpServer(dest, port, verbose).start()
+
+        runBlocking {
+            watchFiles(source, dest, extensions, verbose)
+        }
     }
 
     suspend fun watchFiles(source: Path, dest: Path, extensions: List<String>, verbose: Boolean) {
