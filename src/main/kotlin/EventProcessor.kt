@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.yahoo.platform.yui.compressor.CssCompressor
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor
 import org.mozilla.javascript.ErrorReporter
@@ -162,24 +163,12 @@ class EventProcessor(val changed: WatchFile.ChangedFile, val source: Path, val d
         val path = Paths.get(parentDir.toString(), result.fullname)
 
         if (verbose) {
-            val origSize = humanReadableByteCount(content.length.toLong())
-            val newSize = humanReadableByteCount(result.content.length.toLong())
+            val origSize = humanReadableByteCount(content.length)
+            val newSize = humanReadableByteCount(result.content.length)
             println("Compiled ${dir.fileName}, $origSize → $newSize")
         }
 
         Files.write(path, result.content.toByteArray())
         return path
-    }
-
-    // Credit: https://stackoverflow.com/a/59234917
-    private fun humanReadableByteCount(bytes: Long): String = when {
-        bytes == Long.MIN_VALUE || bytes < 0 -> "N/A"
-        bytes < 1024L -> "$bytes bytes"
-        bytes <= 0xfffccccccccccccL shr 40 -> "%.1f KB".format(bytes.toDouble() / (0x1 shl 10))
-        bytes <= 0xfffccccccccccccL shr 30 -> "%.1f MB".format(bytes.toDouble() / (0x1 shl 20))
-        bytes <= 0xfffccccccccccccL shr 20 -> "%.1f GB".format(bytes.toDouble() / (0x1 shl 30))
-        bytes <= 0xfffccccccccccccL shr 10 -> "%.1f TB".format(bytes.toDouble() / (0x1 shl 40))
-        bytes <= 0xfffccccccccccccL -> "%.1f PiB".format((bytes shr 10).toDouble() / (0x1 shl 40))
-        else -> "%.1f EB".format((bytes shr 20).toDouble() / (0x1 shl 40))
     }
 }
