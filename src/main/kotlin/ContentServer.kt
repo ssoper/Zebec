@@ -1,6 +1,5 @@
 package com.seansoper.zebec
 
-import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import java.io.File
@@ -9,7 +8,7 @@ import java.net.InetSocketAddress
 import java.net.URI
 import java.nio.file.Path
 
-class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
+class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
 
     val basePath: String
 
@@ -39,13 +38,12 @@ class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
 
         HttpServer.create(InetSocketAddress(port), 0).apply {
             createContext("/", handler)
+            createContext("/sse", sse)
             start()
         }
     }
 
-    private data class Response(val file: File, val contentType: ContentType, val logger: RequestLogger?)
-
-    private class RequestLogger(val path: String) {
+    class RequestLogger(val path: String) {
         private var content: String = "Received request for $path"
 
         fun add(event: String) {
@@ -58,34 +56,71 @@ class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
         }
     }
 
-    private val handler = { it: HttpExchange ->
+    private val clients: MutableMap<String, HttpExchange> = mutableMapOf()
+
+    fun refresh() {
+        if (verbose) {
+            println("Refresh event received, updating ${clients.count()} clients")
+        }
+
+        clients.forEach { (_, context) ->
+            PrintWriter(context.responseBody).use {
+                it.print("data: refresh\n\n")
+            }
+        }
+    }
+
+    private fun getClientId(path: String): String? {
+        val regex = Regex("/([0-9]|[a-z]){6}\$")
+        return regex.find(path)?.value?.removePrefix("/")
+    }
+
+    private val sse = fun(context: HttpExchange) {
+        val clientId = getClientId(context.requestURI.path) ?: return
+
+        if (context.requestMethod == "DELETE") {
+            if (verbose) {
+                println("Client $clientId disconnected")
+            }
+
+            clients.remove(clientId)
+
+            context.responseHeaders.add("Content-Type", "text/plain")
+            context.sendResponseHeaders(200, 0)
+            PrintWriter(context.responseBody).use {
+                it.print("Removed client")
+            }
+
+            return
+        }
+
+        if (verbose) {
+            println("Client $clientId connected via SSE")
+        }
+
+        clients[clientId] = context
+
+        context.responseHeaders.add("Content-Type", "text/event-stream")
+        context.responseHeaders.add("Cache-Control", "no-cache")
+        context.responseHeaders.add("Connection", "Keep-Alive")
+        context.responseHeaders.add("Keep-Alive", "timeout=600")
+        context.sendResponseHeaders(200, 0)
+    }
+
+    private val handler = fun(it: HttpExchange) {
         val logger = if (verbose) {
             RequestLogger(it.requestURI.path)
         } else {
             null
         }
 
+        it.responseHeaders.add("Cache-Control", "no-cache")
         it.responseHeaders.add("via", "zebec 1.0")
 
-        parse(it.requestURI, logger)?.let { (file, contentType, logger) ->
-            it.responseHeaders.add("Content-Type", contentType.type)
+        parse(it.requestURI, logger)?.let { response ->
+            it.responseHeaders.add("Content-Type", response.contentType.type)
             it.sendResponseHeaders(200, 0)
-            logger?.add("Content type: ${contentType.type}")
-
-            if (contentType.isBinary()) {
-                val bytes = file.readBytes()
-                logger?.add("Size: ${humanReadableByteCount(bytes.size)} (binary)")
-                it.responseBody.write(bytes)
-                it.responseBody.close()
-                logger?.close()
-            } else {
-                PrintWriter(it.responseBody).use { response ->
-                    val text = file.readText()
-                    logger?.add("Size: ${humanReadableByteCount(text.length)}")
-                    response.println(text)
-                    logger?.close()
-                }
-            }
+            response.serve(it.responseBody)
         } ?: run {
             it.responseHeaders.add("Content-Type", "text/plain")
             it.sendResponseHeaders(404, 0)
@@ -95,7 +130,7 @@ class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
         }
     }
 
-    private fun parse(requestURI: URI, logger: RequestLogger?): Response? {
+    private fun parse(requestURI: URI, logger: RequestLogger?): ContentResponse? {
         val path = if (requestURI.path.endsWith("/")) {
             "$basePath${requestURI.path}index.html"
         } else {
@@ -108,7 +143,7 @@ class HttpServer(path: Path, val port: Int, val verbose: Boolean) {
 
         return if (file.exists()) {
             val contentType = getContentType(path.split(".").last())
-            Response(file, contentType, logger)
+            ContentResponse(file, contentType, logger)
         } else {
             null
         }

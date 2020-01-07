@@ -23,14 +23,15 @@ object Core {
             exitProcess(1)
         }
 
-        HttpServer(dest, port, verbose).start()
+        val server = ContentServer(dest, port, verbose)
+        server.start()
 
         runBlocking {
-            watchFiles(source, dest, extensions, verbose)
+            watchFiles(source, dest, extensions, server, verbose)
         }
     }
 
-    suspend fun watchFiles(source: Path, dest: Path, extensions: List<String>, verbose: Boolean) {
+    suspend fun watchFiles(source: Path, dest: Path, extensions: List<String>, server: ContentServer, verbose: Boolean) {
         val watch = try {
             WatchFile(listOf(source), extensions)
         } catch (exception: NoSuchFileException) {
@@ -58,6 +59,8 @@ object Core {
                         println("Copied to $it")
                     } ?: println("Failed to compile")
                 }
+
+                server.refresh()
             }
         }
     }

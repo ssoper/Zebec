@@ -11,7 +11,7 @@ Static site generator using a common sense DSL
 * ~~Any changes to DSL files generates new HTML files~~
 * ~~Any changes to linked assets (CSS, JS) generates new compressed files~~
 * ~~Create web server that will serve up HTML and any required assets~~
-* Localhost automatically refreshes page on any changes
+* ~~Localhost automatically refreshes page on any changes~~
 
 ## Ideas
 
@@ -21,3 +21,4 @@ Static site generator using a common sense DSL
 * Site index
 * Keywords
 * Templating
+* Option to turn off auto refreshing
