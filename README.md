@@ -16,9 +16,9 @@ Static site generator using a common sense DSL
 ## Ideas
 
 * ~~More checking for path existence in watcher, use of exception handling~~
-* Robots.txt
 * Blog
-* Site index
 * Keywords
 * Templating
 * Option to turn off auto refreshing
+* [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
+* [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
