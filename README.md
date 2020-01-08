@@ -22,3 +22,4 @@ Static site generator using a common sense DSL
 * Option to turn off auto refreshing
 * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
 * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
+* Generate shields.io badges (w3c validation, link backs, etc.)
