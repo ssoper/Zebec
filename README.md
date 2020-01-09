@@ -1,23 +1,20 @@
-# StaticSite
+<p align="center"><img src="//github.com/ssoper/Zebec/gh/zebec.png" alt="zebec Logo"></p>
 
-Static site generator using a common sense DSL
+# Zebec
 
-## TODO
+Simple static site generator. Written in Kotlin.
 
-* ~~Create DSL parser that outputs HTML~~
-* ~~Update personal site to use better CSS/JS (more linked, less inline)~~
-* ~~Create file watcher service that can watch directories and filter on file types~~
-* ~~Service encapsulated in single JAR file~~
-* ~~Any changes to DSL files generates new HTML files~~
-* ~~Any changes to linked assets (CSS, JS) generates new compressed files~~
-* ~~Create web server that will serve up HTML and any required assets~~
-* ~~Localhost automatically refreshes page on any changes~~
+## Features
 
-## Ideas
+* HTML files compiled from Kotlin DSL (KTML).
+* Includes minifier for CSS and JavaScript files. 
+* File watcher service that automatically compiles changed files.
+* Local development facilitated by built-in web server that refreshes pages for changed files.
 
-* ~~More checking for path existence in watcher, use of exception handling~~
+## Roadmap
+
 * Blog
-* Keywords
+* Keywords/Tagging
 * Templating
 * Option to turn off auto refreshing
 * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
