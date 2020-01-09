@@ -1,4 +1,4 @@
-<p align="center"><img src="//raw.githubusercontent.com/ssoper/Zebec/master/gh/zebec.png" alt="zebec Logo"></p>
+<p align="center"><img src="https://github.com/ssoper/Zebec/raw/master/gh/zebec.png" alt="zebec Logo"></p>
 
 # Zebec
 
