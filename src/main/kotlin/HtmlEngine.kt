@@ -111,7 +111,7 @@ class HtmlEngine {
 
         override fun render(indent: Int): String {
             val content = super.render(indent)
-            return "<!DOCTYPE html>\n$content"
+            return "<!doctype html>\n$content"
         }
 
         fun head(init: Head.() -> Unit) = initTag(Head(), init)

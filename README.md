@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/ssoper/Zebec/raw/master/gh/zebec.png" alt="zebec Logo"></p>
+<p align="center"><img src="https://github.com/ssoper/Zebec/raw/master/gh/zebec.png" alt="Zebec Logo"></p>
 
 # Zebec
 
@@ -21,3 +21,5 @@ Simple static site generator. Written in Kotlin.
     * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
 * Generate shields.io badges (examples: w3c validation, link backs, etc.)
+* Publish a JAR
+* Saved state of compiled files via local database (SQL file)
