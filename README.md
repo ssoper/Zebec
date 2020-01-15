@@ -16,9 +16,15 @@ Static site compiler. Written in Kotlin.
 
 ## Roadmap
 
-* Blogging
-* Keywords/Tagging
+* Tests!
+    * Github Actions
+    * Surface test results, code coverage via badges
 * Templating
+* Blogging
+    * List entries
+    * Entry index
+    * Unsplash
+    * Keywords/Tagging
 * Generate site files
     * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
