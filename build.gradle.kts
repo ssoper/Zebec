@@ -38,8 +38,8 @@ publishing {
         create<MavenPublication>("gpr") {
             run {
                 groupId = "com.seansoper"
-                artifactId = "Zebec"
-                version = "1.0"
+                artifactId = "zebec"
+                version = "1.0.0"
                 artifact("$rootDir/out/artifacts/${artifactId}_main_jar/$artifactId.jar")
             }
         }
