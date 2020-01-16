@@ -1,6 +1,7 @@
 <p align="center"><img src="https://github.com/ssoper/Zebec/raw/master/gh/zebec.png" alt="Zebec Logo"></p>
 
 [![Maven](https://img.shields.io/badge/maven-v1.0-blue)](https://github.com/ssoper/Zebec/packages/104848)
+[![License](https://img.shields.io/github/license/ssoper/Zebec)](https://github.com/ssoper/Zebec/blob/master/LICENSE)
 
 # Zebec
 

@@ -19,7 +19,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$jsr223WorkingVersion")
     implementation("org.jetbrains.kotlin:kotlin-script-util:$jsr223WorkingVersion")
     compile(files("src/main/libs/yuicompressor-2.4.8.jar"))
-
+    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 }
 
 tasks.compileKotlin {
@@ -28,6 +28,10 @@ tasks.compileKotlin {
 
 tasks.compileTestKotlin {
     this.kotlinOptions.jvmTarget = "1.8"
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 val githubProperties = Properties()
