@@ -21,4 +21,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./build/reports/jacoco/report.xml
+          flags: unittests
           fail_ci_if_error: true
