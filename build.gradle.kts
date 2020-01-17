@@ -81,6 +81,17 @@ tasks.register("parseJacocoReport") {
     outputFile.writeText(output)
 }
 
+tasks.register("createGistPayload") {
+    dependsOn(":parseJacocoReport")
+
+    val inputFile = File("$buildDir/reports/jacoco/report.json")
+    var content = inputFile.readText().replace("\"", "\\\"")
+    content = "{\"files\":{\"report.json\":{\"content\": \"$content\"}}}"
+
+    val outputFile = File("$buildDir/gist.json")
+    outputFile.writeText(content)
+}
+
 publishing {
     publications {
         create<MavenPublication>("gpr") {

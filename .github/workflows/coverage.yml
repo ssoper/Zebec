@@ -11,15 +11,13 @@ jobs:
         with:
           java-version: '11.0.4'
           java-package: jdk
-      - name: Generate coverage report
+      - name: Run tests
         run: |
-          ./gradlew check
           ./gradlew test
-          ./gradlew jacocoTestReport
-      - name: Upload coverage to Codecov  
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./build/reports/jacoco/report.xml
-          flags: unittests
-          fail_ci_if_error: true
+      - name: Upload coverage to gist
+        run: |
+          ./gradlew createGistPayload
+          curl -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
+               -H "Content-Type: application/json" \
+               -X PATCH \
+               --data @build/gist.json https://api.github.com/gists/2741eb65fdb9bdee723e50d7648294ed
