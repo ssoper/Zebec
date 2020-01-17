@@ -69,9 +69,17 @@ tasks.register("parseJacocoReport") {
         "\"${it.type}\": {\"missed\": ${it.missed}, \"covered\": ${it.covered}, \"ratio\": ${it.ratio}, \"ratioStr\": \"${it.ratioStr}%\"}"
     }
 
-    val total = "%.0f".format(results.map { it.ratio }.average()*100)
+    val average = results.map { it.ratio }.average()
+    val color = when(average) {
+        in 0.0..0.25 -> "yellow"
+        in 0.26..0.5 -> "yellowgreen"
+        in 0.51..0.75 -> "green"
+        else -> "brightgreen"
+    }
+
+    val total = "%.0f".format(average*100)
     output += """
-        , "total": "${total}%"
+        , "total": "${total}%", "color": "$color"
     """.trimIndent()
     output = "{${output}}"
 
