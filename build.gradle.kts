@@ -44,8 +44,6 @@ tasks.jacocoTestReport {
 }
 
 tasks.register("parseJacocoReport") {
-    dependsOn(":jacocoTestReport")
-
     val inputFile = File("$buildDir/reports/jacoco/report.xml")
     data class CoverageResult(val type: String, val missed: Int, val covered: Int, val ratio: Double, val ratioStr: String)
 
@@ -82,8 +80,6 @@ tasks.register("parseJacocoReport") {
 }
 
 tasks.register("createGistPayload") {
-    dependsOn(":parseJacocoReport")
-
     val inputFile = File("$buildDir/reports/jacoco/report.json")
     var content = inputFile.readText().replace("\"", "\\\"")
     content = "{\"files\":{\"report.json\":{\"content\": \"$content\"}}}"

@@ -14,8 +14,10 @@ jobs:
       - name: Run tests
         run: |
           ./gradlew test
+          ./gradlew jacocoTestReport
       - name: Upload coverage to gist
         run: |
+          ./gradlew parseJacocoReport
           ./gradlew createGistPayload
           curl -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
                -H "Content-Type: application/json" \
