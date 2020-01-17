@@ -61,7 +61,12 @@ publishing {
             url = uri("https://maven.pkg.github.com/ssoper/Zebec") // Github Package
             credentials {
                 val githubProperties = Properties()
-                githubProperties.load(FileInputStream(rootProject.file("github.properties")))
+
+                try {
+                    githubProperties.load(FileInputStream(rootProject.file("github.properties")))
+                } catch (exception: Exception) {
+                    println("WARN: Couldn’t find github.properties file")
+                }
 
                 //Fetch these details from the properties file or from Environment variables
                 username = githubProperties.get("gpr.usr") as String? ?: System.getenv("GPR_USER")
