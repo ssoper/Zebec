@@ -43,9 +43,6 @@ tasks.jacocoTestReport {
     }
 }
 
-val githubProperties = Properties()
-githubProperties.load(FileInputStream(rootProject.file("github.properties")))
-
 publishing {
     publications {
         create<MavenPublication>("gpr") {
@@ -63,6 +60,9 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/ssoper/Zebec") // Github Package
             credentials {
+                val githubProperties = Properties()
+                githubProperties.load(FileInputStream(rootProject.file("github.properties")))
+
                 //Fetch these details from the properties file or from Environment variables
                 username = githubProperties.get("gpr.usr") as String? ?: System.getenv("GPR_USER")
                 password = githubProperties.get("gpr.key") as String? ?: System.getenv("GPR_API_KEY")
