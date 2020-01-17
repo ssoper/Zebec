@@ -1,0 +1,25 @@
+name: Generate test coverage report
+on: [push]
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: 
+        java-version: [1.8]
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Setup Java  
+        uses: actions/setup-java@v1
+      - name: Generate coverage report
+        run: |
+          ./gradlew check
+          ./gradlew test
+          ./gradlew jacocoTestReport
+    - name: Upload coverage to Codecov  
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./build/reports/jacoco/report.xml
+        fail_ci_if_error: true
