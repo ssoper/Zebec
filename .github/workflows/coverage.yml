@@ -1,4 +1,4 @@
-name: Generate test coverage report
+name: tests
 on: [push]
 jobs:
   run:
