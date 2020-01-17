@@ -4,6 +4,7 @@ import java.util.*
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.3.61"
     id("maven-publish")
+    id("jacoco")
 }
 
 repositories {
@@ -32,6 +33,14 @@ tasks.compileTestKotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    executionData("$buildDir/jacoco/test.exec")
+    reports {
+        xml.isEnabled = true
+        xml.destination = File("$buildDir/reports/jacoco/report.xml")
+    }
 }
 
 val githubProperties = Properties()
