@@ -17,9 +17,9 @@ jobs:
           ./gradlew check
           ./gradlew test
           ./gradlew jacocoTestReport
-    - name: Upload coverage to Codecov  
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./build/reports/jacoco/report.xml
-        fail_ci_if_error: true
+      - name: Upload coverage to Codecov  
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./build/reports/jacoco/report.xml
+          fail_ci_if_error: true
