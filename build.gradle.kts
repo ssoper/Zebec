@@ -43,6 +43,44 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.register("parseJacocoReport") {
+    dependsOn(":jacocoTestReport")
+
+    val inputFile = File("$buildDir/reports/jacoco/report.xml")
+    data class CoverageResult(val type: String, val missed: Int, val covered: Int, val ratio: Double, val ratioStr: String)
+
+    val parse = fun(type: String): CoverageResult? {
+        val regex = Regex("<counter type=\"$type\" missed=\"(\\d+)\" covered=\"(\\d+)\"/>")
+        return regex.findAll(inputFile.readText())?.lastOrNull()?.let {
+            return if (it.groups.count() < 3) {
+                println("WARN: No coverage data found for $type")
+                null
+            } else {
+                val missed = it.groups[1]?.value?.toInt() ?: 0
+                val covered = it.groups[2]?.value?.toInt() ?: 0
+                val ratio = covered.toDouble()/missed.toDouble()
+                val ratioStr =  "%.0f".format(ratio*100)
+                CoverageResult(type.toLowerCase(), missed, covered, ratio, ratioStr)
+            }
+        }
+    }
+
+    val types = setOf("INSTRUCTION", "BRANCH", "LINE", "COMPLEXITY", "METHOD", "CLASS")
+    val results = types.mapNotNull(parse)
+    var output = results.joinToString {
+        "\"${it.type}\": {\"missed\": ${it.missed}, \"covered\": ${it.covered}, \"ratio\": ${it.ratio}, \"ratioStr\": \"${it.ratioStr}%\"}"
+    }
+
+    val total = "%.0f".format(results.map { it.ratio }.average()*100)
+    output += """
+        , "total": "${total}%"
+    """.trimIndent()
+    output = "{${output}}"
+
+    val outputFile = File("$buildDir/reports/jacoco/report.json")
+    outputFile.writeText(output)
+}
+
 publishing {
     publications {
         create<MavenPublication>("gpr") {
