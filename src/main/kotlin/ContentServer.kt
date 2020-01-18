@@ -50,9 +50,14 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
             content += "\n* $event"
         }
 
-        fun close() {
+        fun close(consumer: ((String) -> Unit)? = null) {
             content += "\nFinished request for $path\n"
-            println(content)
+
+            consumer?.let {
+                it(content)
+            } ?: run {
+                println(content)
+            }
         }
     }
 
