@@ -1,7 +1,6 @@
 import com.seansoper.zebec.ContentResponse
 import com.seansoper.zebec.ContentServer
 import io.kotlintest.matchers.string.shouldContain
-import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import java.io.File
 
