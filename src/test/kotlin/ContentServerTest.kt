@@ -1,4 +1,5 @@
 import com.seansoper.zebec.ContentServer
+import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.string.shouldContain
 import io.kotlintest.matchers.string.shouldEndWith
@@ -12,6 +13,7 @@ class ContentServerTest: StringSpec({
         val result = ContentServer.ContentType.valueOf("html")
         result.shouldBe(ContentServer.ContentType.html)
         result.type.shouldBe("text/html")
+        result.isBinary().shouldBeFalse()
     }
 
     "jpg content type" {
