@@ -71,10 +71,10 @@ tasks.register("parseJacocoReport") {
 
     val average = results.map { it.ratio }.average()
     val color = when(average) {
-        in 0.0..0.25 -> "yellow"
-        in 0.26..0.5 -> "yellowgreen"
-        in 0.51..0.75 -> "green"
-        else -> "brightgreen"
+        in 0.0..0.25 -> "orange"
+        in 0.26..0.5 -> "yellow"
+        in 0.51..0.75 -> "yellowgreen"
+        else -> "green"
     }
 
     val total = "%.0f".format(average*100)
