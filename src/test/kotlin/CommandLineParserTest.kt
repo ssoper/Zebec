@@ -6,6 +6,7 @@ import io.kotlintest.matchers.string.shouldEndWith
 import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import kotlin.script.experimental.jvm.impl.getResourcePathForClass
 
 class CommandLineParserTest: StringSpec({
 

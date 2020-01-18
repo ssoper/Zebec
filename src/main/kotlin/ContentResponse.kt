@@ -43,7 +43,7 @@ class ContentResponse(val file: File, val contentType: ContentServer.ContentType
         }
     }
 
-    val script = """
+    private val script = """
         const clientId=(Math.random().toString(36).substring(2,5)+Math.random().toString(36).substring(2,5)).toLowerCase(),sse=new EventSource("/sse/"+clientId),removeClient=function(e,n){fetch("/sse/"+e,{method:"DELETE"}).then(function(){n&&n()})};sse.onmessage=function(e){"refresh"==e.data&&removeClient(clientId,function(){location.reload(!0)})},window.addEventListener("beforeunload",function(){removeClient(clientId)});
     """.trimIndent()
 }
