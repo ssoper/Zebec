@@ -6,7 +6,6 @@ import java.io.File
 
 class ContentResponseTest: StringSpec({
     val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    fun loadResource(fileName: String): File = File(this.javaClass.classLoader.getResource(fileName)!!.toURI())
 
     // Credit: https://www.baeldung.com/kotlin-random-alphanumeric-string
     fun randomString(length: Int = 10): String  = (1..length)
@@ -17,7 +16,7 @@ class ContentResponseTest: StringSpec({
     "serve html" {
         val path = "/tmp/${randomString()}.html"
         val output = File(path)
-        val input = loadResource("test.html")
+        val input = TestHelper.loadResource("test.html")
         val response = ContentResponse(input, ContentServer.ContentType.html, null)
         response.serve(output.outputStream())
 
