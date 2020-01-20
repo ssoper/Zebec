@@ -22,8 +22,8 @@ Static site compiler. Written in Kotlin.
 * Tests!
     * Github Actions
     * Surface test results, code coverage via badges
-* Templating
 * Blogging
+    * Templating
     * List entries
     * Entry index
     * Unsplash

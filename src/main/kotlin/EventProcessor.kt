@@ -136,6 +136,7 @@ class EventProcessor(val changed: WatchFile.ChangedFile, val source: Path, val d
         } catch (exception: ScriptException) {
             if (verbose) {
                 println("ERROR: Code didn’t compile")
+                println(exception.localizedMessage)
             }
 
             null

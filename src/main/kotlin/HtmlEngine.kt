@@ -46,6 +46,32 @@ class HtmlEngine {
         }
     }
 
+    // TODO: Coalesce this and the script tag
+    interface SupportsImageTag {
+        fun imageTag(src: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
+            attributes?.also {
+                val finalAttrs = it.toMutableMap()
+                finalAttrs["src"] = src
+                addTag(finalAttrs)
+            } ?: run {
+                addTag(mapOf("src" to src))
+            }
+        }
+    }
+
+    // TODO: Use an enum for the type
+    interface SupportsInputTag {
+        fun inputTag(type: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
+            attributes?.also {
+                val finalAttrs = it.toMutableMap()
+                finalAttrs["type"] = type
+                addTag(finalAttrs)
+            } ?: run {
+                addTag(mapOf("type" to type))
+            }
+        }
+    }
+
     abstract class Tag(type: String, attributes: TagAttributes? = null) : Element(type, attributes) {
         var children: Array<Element> = emptyArray()
 
@@ -134,6 +160,7 @@ class HtmlEngine {
 
     class Body : Tag("body"), SupportsScriptTag {
         fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
+        fun nav(attributes: TagAttributes?, init: NavTag.() -> Unit) = initTag(NavTag(attributes), init)
         fun comment(comment: String) = addTag(TagComment(comment))
         fun noscript(attributes: TagAttributes?, init: NoScriptTag.() -> Unit) = initTag(NoScriptTag(attributes), init)
         fun gaTag(site: String) = addTag(GoogleAnalyticsTag(site))
@@ -144,6 +171,10 @@ class HtmlEngine {
         }
     }
 
+    class NavTag(attributes: TagAttributes?) : Tag("nav", attributes) {
+        fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
+    }
+
     class NoScriptTag(attributes: TagAttributes?) : Tag("noscript", attributes), SupportsLinkTag {
         fun link(relType: LinkRelType, attributes: TagAttributes) {
             linkTag(relType, attributes) {
@@ -152,12 +183,35 @@ class HtmlEngine {
         }
     }
 
-    class DivTag(attributes: TagAttributes?) : Tag("div", attributes) {
+    class DivTag(attributes: TagAttributes?) : Tag("div", attributes), SupportsImageTag, SupportsInputTag, SupportsATag {
         fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
         fun p(attributes: TagAttributes?, init: PTag.() -> Unit) = initTag(PTag(attributes), init)
         fun p(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("p", text, attributes))
         fun h1(text: String, attributes: TagAttributes?) = addTag(TagWithText("h1", text, attributes))
+        fun h5(text: String, attributes: TagAttributes?) = addTag(TagWithText("h5", text, attributes))
         fun ul(attributes: TagAttributes? = null, init: UlTag.() -> Unit) = initTag(UlTag(attributes), init)
+        fun button(attributes: TagAttributes? = null, init: ButtonTag.() -> Unit) = initTag(ButtonTag(attributes), init)
+        fun hr(attributes: TagAttributes? = null) = addTag(TagSelfClosing("hr", attributes))
+        fun span(attributes: TagAttributes? = null, init: SpanTag.() -> Unit) = initTag(SpanTag(attributes), init)
+        fun comment(comment: String) = addTag(TagComment(comment))
+
+        fun image(src: String, attributes: TagAttributes?) {
+            imageTag(src, attributes) {
+                addTag(TagSelfClosing("img", it))
+            }
+        }
+
+        fun input(type: String, attributes: TagAttributes?) {
+            inputTag(type, attributes) {
+                addTag(TagSelfClosing("input", it))
+            }
+        }
+
+        fun a(text: String, href: String, attributes: TagAttributes? = null) {
+            aTag(text, href, attributes) {
+                addTag(TagWithText("a", text, it))
+            }
+        }
     }
 
     class UlTag(attributes: TagAttributes?) : Tag("ul", attributes) {
@@ -173,12 +227,20 @@ class HtmlEngine {
         }
     }
 
+    class ButtonTag(attributes: TagAttributes?) : Tag("button", attributes) {
+        fun span(text: String, attributes: TagAttributes?) = addTag(TagWithText("span", text, attributes))
+    }
+
     class PTag(attributes: TagAttributes?) : Tag("p", attributes), SupportsATag {
         fun a(text: String, href: String, attributes: TagAttributes? = null) {
             aTag(text, href, attributes) {
                 addTag(TagWithText("a", text, it))
             }
         }
+    }
+
+    class SpanTag(attributes: TagAttributes?): Tag("span", attributes) {
+        fun button(text: String, attributes: TagAttributes?) = addTag(TagWithText("button", text, attributes))
     }
 
     class GoogleAnalyticsTag(val site: String) : Element("script") {
