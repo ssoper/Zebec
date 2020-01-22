@@ -54,6 +54,94 @@ class HtmlEngineTest: StringSpec({
         result.shouldContain("<h1 class='cover-heading'>Page Title</h1>")
     }
 
+    "h2 tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    h2("Subtitle", mapOf("class" to "cover-heading"))
+                }
+            }
+        }.render()
+        result.shouldContain("<h2 class='cover-heading'>Subtitle</h2>")
+    }
+
+    "h3 tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    h3("Smaller title", mapOf("class" to "cover-heading"))
+                }
+            }
+        }.render()
+        result.shouldContain("<h3 class='cover-heading'>Smaller title</h3>")
+    }
+
+    "h4 tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    h4("Even smaller title", mapOf("class" to "cover-heading"))
+                }
+            }
+        }.render()
+        result.shouldContain("<h4 class='cover-heading'>Even smaller title</h4>")
+    }
+
+    "h5 tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    h5("Smallest title", mapOf("class" to "cover-heading"))
+                }
+            }
+        }.render()
+        result.shouldContain("<h5 class='cover-heading'>Smallest title</h5>")
+    }
+
+    "blockquote tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    blockquote("This is a blockquote")
+                }
+            }
+        }.render()
+        result.shouldContain("<blockquote>This is a blockquote</blockquote>")
+    }
+
+    "hr tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    hr()
+                }
+            }
+        }.render()
+        result.shouldContain("<hr />")
+    }
+
+    "comment tag" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    comment("This is a comment")
+                }
+            }
+        }.render()
+        result.shouldContain("<!-- This is a comment -->")
+    }
+
+    "raw html" {
+        val result = HtmlEngine().html {
+            body {
+                div(mapOf("class" to "site-wrapper")) {
+                    raw("<this><is>a</is></this>tag")
+                }
+            }
+        }.render()
+        result.shouldContain("<this><is>a</is></this>tag")
+    }
+
     "anchor tag" {
         val result = HtmlEngine().html {
             body {
