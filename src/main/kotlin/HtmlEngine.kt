@@ -187,15 +187,20 @@ class HtmlEngine {
         fun div(attributes: TagAttributes?, init: DivTag.() -> Unit) = initTag(DivTag(attributes), init)
         fun p(attributes: TagAttributes?, init: PTag.() -> Unit) = initTag(PTag(attributes), init)
         fun p(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("p", text, attributes))
-        fun h1(text: String, attributes: TagAttributes?) = addTag(TagWithText("h1", text, attributes))
-        fun h5(text: String, attributes: TagAttributes?) = addTag(TagWithText("h5", text, attributes))
+        fun h1(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("h1", text, attributes))
+        fun h2(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("h2", text, attributes))
+        fun h3(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("h3", text, attributes))
+        fun h4(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("h4", text, attributes))
+        fun h5(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("h5", text, attributes))
+        fun blockquote(text: String, attributes: TagAttributes? = null) = addTag(TagWithText("blockquote", text, attributes))
         fun ul(attributes: TagAttributes? = null, init: UlTag.() -> Unit) = initTag(UlTag(attributes), init)
         fun button(attributes: TagAttributes? = null, init: ButtonTag.() -> Unit) = initTag(ButtonTag(attributes), init)
         fun hr(attributes: TagAttributes? = null) = addTag(TagSelfClosing("hr", attributes))
         fun span(attributes: TagAttributes? = null, init: SpanTag.() -> Unit) = initTag(SpanTag(attributes), init)
         fun comment(comment: String) = addTag(TagComment(comment))
+        fun raw(content: String) = addTag(Raw(content))
 
-        fun image(src: String, attributes: TagAttributes?) {
+        fun image(src: String, attributes: TagAttributes? = null) {
             imageTag(src, attributes) {
                 addTag(TagSelfClosing("img", it))
             }
@@ -211,6 +216,13 @@ class HtmlEngine {
             aTag(text, href, attributes) {
                 addTag(TagWithText("a", text, it))
             }
+        }
+    }
+
+    class Raw(val content: String) : Element("raw") {
+        override fun render(indent: Int): String {
+            val indentation = " ".repeat(indent)
+            return "$indentation$content"
         }
     }
 
