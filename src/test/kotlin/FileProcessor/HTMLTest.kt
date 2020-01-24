@@ -1,11 +1,11 @@
 package FileProcessor
 
-import com.seansoper.zebec.FileProcessor.HtmlProcessor
+import com.seansoper.zebec.FileProcessor.HTML
 import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
-class HtmlProcessorTest: StringSpec({
+class HTMLTest: StringSpec({
     "valid html" {
         val source = """
             html {
@@ -24,13 +24,13 @@ class HtmlProcessorTest: StringSpec({
             </html>
         """.trimIndent()
 
-        val result = HtmlProcessor(false).process(source)!!
+        val result = HTML(false).process(source)!!
         result.shouldBe(expected)
     }
 
     "invalid html" {
         val source = "html { invalid }"
-        val result = HtmlProcessor(false).process(source)
+        val result = HTML(false).process(source)
         result.shouldBeNull()
     }
 })

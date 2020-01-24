@@ -1,10 +1,10 @@
 package FileProcessor
 
-import com.seansoper.zebec.FileProcessor.ScriptProcessor
+import com.seansoper.zebec.FileProcessor.Script
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
-class ScriptProcessorTest: StringSpec({
+class ScriptTest: StringSpec({
 
     "stylesheet" {
         val source = """
@@ -13,7 +13,7 @@ class ScriptProcessorTest: StringSpec({
             }
         """.trimIndent()
         val expected = "body{background-color:#fff}"
-        val result = ScriptProcessor(ScriptProcessor.Type.stylesheet, false).process(source)!!
+        val result = Script(Script.Type.stylesheet, false).process(source)!!
         result.shouldBe(expected)
     }
 
@@ -24,7 +24,7 @@ class ScriptProcessorTest: StringSpec({
             });
         """.trimIndent()
         val expected = "\$(function(){document.querySelectorAll(\"pre code\")});"
-        val result = ScriptProcessor(ScriptProcessor.Type.javascript, false).process(source)!!
+        val result = Script(Script.Type.javascript, false).process(source)!!
         result.shouldBe(expected)
     }
 

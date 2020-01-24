@@ -2,16 +2,10 @@ package com.seansoper.zebec.FileProcessor
 
 import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.seansoper.zebec.WatchFile
-import com.yahoo.platform.yui.compressor.CssCompressor
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor
-import org.mozilla.javascript.ErrorReporter
-import org.mozilla.javascript.EvaluatorException
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.script.ScriptEngineManager
-import javax.script.ScriptException
 
 interface Processable {
     fun process(content: String): String?
@@ -25,13 +19,13 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
     fun process(done: (Path?) -> Unit) {
         val path = processFile { filename, extension, content ->
             when (extension) {
-                "ktml" -> HtmlProcessor(verbose).process(content)?.let {
+                "ktml" -> HTML(verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.html")
                 }
-                "js" -> ScriptProcessor(ScriptProcessor.Type.javascript, verbose).process(content)?.let {
+                "js" -> Script(Script.Type.javascript, verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.min.$extension")
                 }
-                "css" -> ScriptProcessor(ScriptProcessor.Type.stylesheet, verbose).process(content)?.let {
+                "css" -> Script(Script.Type.stylesheet, verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.min.$extension")
                 }
                 else -> {

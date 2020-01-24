@@ -16,10 +16,11 @@ val jsr223WorkingVersion = "1.3.21"
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
-    implementation("org.jetbrains.kotlin:kotlin-script-runtime:$jsr223WorkingVersion")
+    implementation( "org.jetbrains.kotlin:kotlin-script-runtime:$jsr223WorkingVersion")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$jsr223WorkingVersion")
     implementation("org.jetbrains.kotlin:kotlin-script-util:$jsr223WorkingVersion")
     compile(files("src/main/libs/yuicompressor-2.4.8.jar"))
+    compile(files("src/main/libs/markdown-0.1.41.jar"))
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 }
 

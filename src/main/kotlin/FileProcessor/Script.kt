@@ -8,7 +8,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class ScriptProcessor(val type: Type, val verbose: Boolean): Processable {
+class Script(val type: Type, val verbose: Boolean): Processable {
 
     enum class Type(val extension: String) {
         javascript("js"),

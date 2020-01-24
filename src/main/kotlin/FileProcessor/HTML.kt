@@ -4,7 +4,7 @@ import com.seansoper.zebec.HtmlEngine
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
-class HtmlProcessor(val verbose: Boolean): Processable {
+class HTML(val verbose: Boolean): Processable {
     override fun process(content: String): String? {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
 
