@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.seansoper.zebec.FileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
@@ -53,7 +54,7 @@ object Core {
                 println("Change detected at ${changed.path}")
             }
 
-            EventProcessor(changed, source, dest, verbose).process {
+            EventHandler(changed, source, dest, verbose).process {
                 if (verbose) {
                     it?.let {
                         println("Copied to $it")
