@@ -1,4 +1,4 @@
-package com.seansoper.zebec.FileProcessor
+package com.seansoper.zebec.fileProcessor
 
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator

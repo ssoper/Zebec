@@ -1,4 +1,4 @@
-package com.seansoper.zebec.FileProcessor
+package com.seansoper.zebec.fileProcessor
 
 import com.yahoo.platform.yui.compressor.CssCompressor
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor

@@ -1,6 +1,6 @@
 package fileProcessor
 
-import com.seansoper.zebec.FileProcessor.Script
+import com.seansoper.zebec.fileProcessor.Script
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 

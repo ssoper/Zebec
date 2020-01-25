@@ -1,4 +1,4 @@
-package com.seansoper.zebec.FileProcessor
+package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.seansoper.zebec.WatchFile

@@ -1,4 +1,4 @@
-package com.seansoper.zebec.FileProcessor
+package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.KTMLParser
 import javax.script.ScriptEngineManager

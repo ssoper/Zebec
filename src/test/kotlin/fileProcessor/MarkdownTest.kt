@@ -1,6 +1,6 @@
 package fileProcessor
 
-import com.seansoper.zebec.FileProcessor.Markdown
+import com.seansoper.zebec.fileProcessor.Markdown
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec

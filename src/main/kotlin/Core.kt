@@ -1,6 +1,6 @@
 package com.seansoper.zebec
 
-import com.seansoper.zebec.FileProcessor.EventHandler
+import com.seansoper.zebec.fileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path

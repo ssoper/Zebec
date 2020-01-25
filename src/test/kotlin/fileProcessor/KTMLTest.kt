@@ -1,6 +1,6 @@
 package fileProcessor
 
-import com.seansoper.zebec.FileProcessor.KTML
+import com.seansoper.zebec.fileProcessor.KTML
 import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
