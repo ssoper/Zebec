@@ -19,15 +19,15 @@ Static site compiler. Written in Kotlin.
 
 ## Roadmap
 
-* Tests!
-    * Github Actions
-    * Surface test results, code coverage via badges
+* ✅ Tests!
+    * ✅ Github Actions
+    * ✅ Surface test results and code coverage via badges
 * Blogging
+    * ✅ Markdown
     * Templating
     * List entries
-    * Entry index
-    * Unsplash
-    * Keywords/Tagging
+    * Filter entries by tag
+    * Social Media [tags](https://blog.hubspot.com/marketing/open-graph-tags-facebook-twitter-linkedin)
 * Generate site files
     * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)

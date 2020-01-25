@@ -103,7 +103,7 @@ publishing {
             run {
                 groupId = "com.seansoper"
                 artifactId = "zebec"
-                version = "1.0.0"
+                version = "1.0.1"
                 artifact("$rootDir/out/artifacts/${artifactId}_main_jar/$artifactId.jar")
             }
         }
