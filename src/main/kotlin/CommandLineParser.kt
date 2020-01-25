@@ -62,7 +62,7 @@ class CommandLineParser(private val args: Array<String>,
         val extensions = parseArguments(regex) { it }
 
         return if (extensions.isEmpty()) {
-            listOf("css", "js", "ktml")
+            listOf("css", "js", "ktml", "md")
         } else {
             extensions
         }

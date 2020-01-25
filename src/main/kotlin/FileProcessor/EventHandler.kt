@@ -28,6 +28,9 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
                 "css" -> Script(Script.Type.stylesheet, verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.min.$extension")
                 }
+                "md" -> Markdown().process(content)?.let {
+                    ProcessedFile(it, "$filename.html")
+                }
                 else -> {
                     if (verbose) {
                         println("ERROR: Unsupported content type $extension")
