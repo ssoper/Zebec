@@ -1,4 +1,4 @@
-package FileProcessor
+package fileProcessor
 
 import com.seansoper.zebec.FileProcessor.Script
 import io.kotlintest.shouldBe

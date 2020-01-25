@@ -1,4 +1,4 @@
-package FileProcessor
+package fileProcessor
 
 import com.seansoper.zebec.FileProcessor.Markdown
 import io.kotlintest.matchers.boolean.shouldBeTrue

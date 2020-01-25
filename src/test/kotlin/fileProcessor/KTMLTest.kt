@@ -1,4 +1,4 @@
-package FileProcessor
+package fileProcessor
 
 import com.seansoper.zebec.FileProcessor.KTML
 import io.kotlintest.matchers.types.shouldBeNull

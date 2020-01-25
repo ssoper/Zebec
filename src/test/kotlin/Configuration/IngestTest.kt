@@ -1,5 +1,7 @@
-import com.seansoper.zebec.Configuration.Ingest
-import com.seansoper.zebec.Configuration.InvalidConfigurationException
+package configuration
+
+import com.seansoper.zebec.configuration.Ingest
+import com.seansoper.zebec.configuration.InvalidConfigurationException
 import io.kotlintest.*
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue

@@ -1,10 +1,9 @@
-package Configuration
+package configuration
 
-import com.seansoper.zebec.Configuration.Parser
+import com.seansoper.zebec.configuration.Parser
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import java.io.File
 
 class ParserTest: StringSpec({
     val path = this.javaClass.classLoader.getResource("zebec.config")!!.path

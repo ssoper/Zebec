@@ -1,4 +1,4 @@
-package com.seansoper.zebec.Configuration
+package com.seansoper.zebec.configuration
 
 import java.nio.file.Path
 import java.nio.file.Paths
