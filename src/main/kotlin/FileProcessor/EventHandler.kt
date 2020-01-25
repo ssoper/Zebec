@@ -19,7 +19,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
     fun process(done: (Path?) -> Unit) {
         val path = processFile { filename, extension, content ->
             when (extension) {
-                "ktml" -> HTML(verbose).process(content)?.let {
+                "ktml" -> KTML(verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.html")
                 }
                 "js" -> Script(Script.Type.javascript, verbose).process(content)?.let {

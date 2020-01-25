@@ -1,15 +1,14 @@
-import com.seansoper.zebec.HtmlEngine
+import com.seansoper.zebec.KTMLParser
 import io.kotlintest.matchers.string.shouldContain
 import io.kotlintest.matchers.string.shouldEndWith
 import io.kotlintest.matchers.string.shouldStartWith
-import io.kotlintest.should
 import io.kotlintest.specs.StringSpec
 
-class HtmlEngineTest: StringSpec({
+class KTMLParserTest: StringSpec({
 
     "title tag" {
         val titleStr = "This is the title"
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             head {
                 title(titleStr)
             }
@@ -22,7 +21,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "meta tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             head {
                 meta(mapOf("charset" to "utf-8"))
             }
@@ -31,16 +30,16 @@ class HtmlEngineTest: StringSpec({
     }
 
     "link tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             head {
-                link(HtmlEngine.LinkRelType.Shortcut, mapOf("type" to "image/x-icon", "href" to "/favicon.ico"))
+                link(KTMLParser.LinkRelType.Shortcut, mapOf("type" to "image/x-icon", "href" to "/favicon.ico"))
             }
         }.render()
         result.shouldContain("<link type='image/x-icon' href='/favicon.ico' rel='shortcut icon' />")
     }
 
     "h1 tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     h1("Page Title", mapOf("class" to "cover-heading"))
@@ -55,7 +54,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "h2 tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     h2("Subtitle", mapOf("class" to "cover-heading"))
@@ -66,7 +65,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "h3 tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     h3("Smaller title", mapOf("class" to "cover-heading"))
@@ -77,7 +76,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "h4 tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     h4("Even smaller title", mapOf("class" to "cover-heading"))
@@ -88,7 +87,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "h5 tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     h5("Smallest title", mapOf("class" to "cover-heading"))
@@ -99,7 +98,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "blockquote tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     blockquote("This is a blockquote")
@@ -110,7 +109,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "hr tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     hr()
@@ -121,7 +120,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "comment tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     comment("This is a comment")
@@ -132,7 +131,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "raw html" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     raw("<this><is>a</is></this>tag")
@@ -143,7 +142,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "anchor tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 div(mapOf("class" to "site-wrapper")) {
                     ul {
@@ -168,7 +167,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "script tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 script("https://code.jquery.com/jquery.min.js", mapOf(
                     "integrity" to "sha",
@@ -183,7 +182,7 @@ class HtmlEngineTest: StringSpec({
     }
 
     "google analytics tag" {
-        val result = HtmlEngine().html {
+        val result = KTMLParser().html {
             body {
                 gaTag("SITE ID")
             }

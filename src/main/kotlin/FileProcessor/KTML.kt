@@ -1,19 +1,19 @@
 package com.seansoper.zebec.FileProcessor
 
-import com.seansoper.zebec.HtmlEngine
+import com.seansoper.zebec.KTMLParser
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
-class HTML(val verbose: Boolean): Processable {
+class KTML(val verbose: Boolean): Processable {
     override fun process(content: String): String? {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
 
         // Because bindings are wonky
-        val updatedContent = "import com.seansoper.zebec.HtmlEngine\n$content".replace("html ", "HtmlEngine().html ")
-            .replace("LinkRelType", "HtmlEngine.LinkRelType")
+        val updatedContent = "import com.seansoper.zebec.KTMLParser\n$content".replace("html ", "KTMLParser().html ")
+            .replace("LinkRelType", "KTMLParser.LinkRelType")
 
         return try {
-            val compiled = engine.eval(updatedContent) as HtmlEngine.HTML
+            val compiled = engine.eval(updatedContent) as KTMLParser.HTML
             compiled.render()
         } catch (exception: ScriptException) {
             if (verbose) {
