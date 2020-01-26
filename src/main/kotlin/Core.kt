@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
 import java.nio.file.NoSuchFileException
@@ -16,19 +17,20 @@ object Core {
             exitProcess(0)
         }
 
-        val (source, dest, port, extensions, verbose) = cli.parse()?.let {
-            it
-        } ?: run {
-            println(cli.errorMessage)
+        val parsed = try {
+            cli.parse()
+        } catch (exception: ConfigFileNotFound) {
             cli.showHelp()
             exitProcess(1)
         }
 
-        val server = ContentServer(dest, port, verbose)
+        val settings = Settings(parsed, System.getProperty("user.dir"))
+
+        val server = ContentServer(settings.destination, settings.port, settings.verbose)
         server.start()
 
         runBlocking {
-            watchFiles(source, dest, extensions, server, verbose)
+            watchFiles(settings.source, settings.destination, settings.extensions.toList(), server, settings.verbose)
         }
     }
 

@@ -16,7 +16,7 @@ class Ingest(val basePath: String) {
         var destination: String? = null
         var port: Int? = null
         var extensions: Array<String>? = null
-        var verbose: Boolean? = false
+        var verbose: Boolean? = false // remove, keep in cmd line, replace with exclude
     }
 
     fun configure(block: Ingestible.() -> Unit): Configuration {

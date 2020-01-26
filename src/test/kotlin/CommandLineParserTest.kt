@@ -1,57 +1,42 @@
 import com.seansoper.zebec.CommandLineParser
+import com.seansoper.zebec.ConfigFileNotFound
 import io.kotlintest.matchers.boolean.shouldBeFalse
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.matchers.string.shouldEndWith
 import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
+import java.nio.file.Paths
 import kotlin.script.experimental.jvm.impl.getResourcePathForClass
 
 class CommandLineParserTest: StringSpec({
 
-    val source = "-source=/empty/path"
+    val path = this.javaClass.classLoader.getResource("zebec.config")!!.path
+    val source = "-config=$path"
 
     "verbose is set to true" {
+        println(source)
         val parser = CommandLineParser(arrayOf("-verbose=true", source))
-        parser.parse()!!.verbose.shouldBeTrue()
+        parser.parse().verbose.shouldBeTrue()
     }
 
     "verbose is not set" {
         val parser = CommandLineParser(arrayOf(source))
-        parser.parse()!!.verbose.shouldBeFalse()
+        parser.parse().verbose.shouldBeFalse()
     }
 
-    "port is set" {
-        val parser = CommandLineParser(arrayOf("-port=9000", source))
-        parser.parse()!!.port.shouldBe(9000)
-    }
-
-    "port is not set" {
+    "config path is set" {
         val parser = CommandLineParser(arrayOf(source))
-        parser.parse()!!.port.shouldBe(8080)
+        parser.parse().pathToConfigFile.toString().shouldEndWith("zebec.config")
     }
 
-    "source is set" {
-        val parser = CommandLineParser(arrayOf(source))
-        parser.parse()!!.source.toString().shouldEndWith("/empty/path")
-    }
-
-    "source is not set" {
-        val parser = CommandLineParser(emptyArray())
-        parser.parse().shouldBeNull()
-    }
-
-    "extension is set" {
-        val parser = CommandLineParser(arrayOf("-extension=zip", source))
-        parser.parse()!!.extensions.shouldContain("zip")
-    }
-
-    "extension is not set" {
-        val parser = CommandLineParser(arrayOf(source))
-        parser.parse()!!.extensions.shouldContain("css")
-        parser.parse()!!.extensions.shouldContain("js")
-        parser.parse()!!.extensions.shouldContain("ktml")
+    "config file doesn’t exist" {
+        shouldThrow<ConfigFileNotFound> {
+            val parser = CommandLineParser(emptyArray())
+            parser.parse().pathToConfigFile.toString().shouldEndWith("zebec.config")
+        }
     }
 
 })
