@@ -4,6 +4,7 @@ import com.seansoper.zebec.fileProcessor.Markdown
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import java.net.URL
 
 class MarkdownTest: StringSpec({
 
@@ -27,10 +28,14 @@ class MarkdownTest: StringSpec({
     "parse metadata" {
         val author = "Sinead O’Connor St. Mark's"
         val title = "This is. A, title. it’s your's. Also 9"
+        val subtitle = "This is the subtitle"
+        val image = "http://placekitten.com/900/300"
         val tags = "kotlin, programming,java"
         val source = """
             [//]: # (zauthor: $author)
             [//]: # (ztitle: $title)
+            [//]: # (zsubtitle: $subtitle)
+            [//]: # (zimage: $image)
             [//]: # (ztags: $tags)
             This is the **content**
         """.trimIndent()
@@ -38,6 +43,9 @@ class MarkdownTest: StringSpec({
         val blog = Markdown().parseMetaData(source)!!
         blog.author.shouldBe(author)
         blog.title.shouldBe(title)
+        blog.imageURL!!.toString().shouldBe(image)
+        blog.subtitle!!.shouldBe(subtitle)
+
         val strTags = tags.split(", ?".toRegex())
         strTags.count().shouldBe(3)
         strTags.forEach { blog.tags.contains(it).shouldBeTrue() }
