@@ -31,12 +31,14 @@ class MarkdownTest: StringSpec({
         val subtitle = "This is the subtitle"
         val image = "http://placekitten.com/900/300"
         val tags = "kotlin, programming,java"
+        val template = "blog.ktml"
         val source = """
             [//]: # (zauthor: $author)
             [//]: # (ztitle: $title)
             [//]: # (zsubtitle: $subtitle)
             [//]: # (zimage: $image)
             [//]: # (ztags: $tags)
+            [//]: # (ztemplate: $template)
             This is the **content**
         """.trimIndent()
 
@@ -45,6 +47,7 @@ class MarkdownTest: StringSpec({
         blog.title.shouldBe(title)
         blog.imageURL!!.toString().shouldBe(image)
         blog.subtitle!!.shouldBe(subtitle)
+        blog.template!!.shouldBe(template)
 
         val strTags = tags.split(", ?".toRegex())
         strTags.count().shouldBe(3)

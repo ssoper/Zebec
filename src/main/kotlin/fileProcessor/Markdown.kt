@@ -11,7 +11,8 @@ class Markdown: Processable {
                     val title: String,
                     val tags: Array<String>,
                     val imageURL: URL?,
-                    val subtitle: String?)
+                    val subtitle: String?,
+                    val template: String?)
 
     private val TitleRegex: String = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
 
@@ -26,7 +27,7 @@ class Markdown: Processable {
         val title = parseTitle(content)
 
         return if (author != null && title != null) {
-            Blog(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content))
+            Blog(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content), parseTemplate(content))
         } else {
             null
         }
@@ -44,6 +45,11 @@ class Markdown: Processable {
 
     private fun parseSubtitle(content: String): String? {
         val regex = Regex("^\\[//]: # \\(zsubtitle: $TitleRegex\\)$", setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE))
+        return regex.find(content)?.groups?.get(1)?.value
+    }
+
+    private fun parseTemplate(content: String): String? {
+        val regex = Regex("^\\[//]: # \\(ztemplate: ([^\\s]+)\\)$", setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE))
         return regex.find(content)?.groups?.get(1)?.value
     }
 
