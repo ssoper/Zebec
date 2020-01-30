@@ -1,4 +1,5 @@
 import java.io.FileInputStream
+import java.lang.Integer.min
 import java.util.*
 
 plugins {
@@ -56,7 +57,7 @@ tasks.register("parseJacocoReport") {
                 null
             } else {
                 val missed = it.groups[1]?.value?.toInt() ?: 0
-                val covered = it.groups[2]?.value?.toInt() ?: 0
+                val covered = min(it.groups[2]?.value?.toInt() ?: 0, 100)
                 val ratio = covered.toDouble()/missed.toDouble()
                 val ratioStr =  "%.0f".format(ratio*100)
                 CoverageResult(type.toLowerCase(), missed, covered, ratio, ratioStr)
