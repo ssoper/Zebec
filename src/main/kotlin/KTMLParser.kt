@@ -199,6 +199,7 @@ class KTMLParser {
         fun span(attributes: TagAttributes? = null, init: SpanTag.() -> Unit) = initTag(SpanTag(attributes), init)
         fun comment(comment: String) = addTag(TagComment(comment))
         fun raw(content: String) = addTag(Raw(content))
+        fun content() = addTag(TagSelfClosing("zebeccontent", null))
 
         fun image(src: String, attributes: TagAttributes? = null) {
             imageTag(src, attributes) {

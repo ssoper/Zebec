@@ -5,6 +5,7 @@ import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
 class KTML(val verbose: Boolean): Processable {
+
     override fun process(content: String): String? {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
 
@@ -24,4 +25,5 @@ class KTML(val verbose: Boolean): Processable {
             null
         }
     }
+
 }

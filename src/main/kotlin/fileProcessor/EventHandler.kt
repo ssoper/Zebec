@@ -2,6 +2,7 @@ package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.seansoper.zebec.WatchFile
+import com.seansoper.zebec.configuration.Settings
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -11,7 +12,7 @@ interface Processable {
     fun process(content: String): String?
 }
 
-class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val dest: Path, val verbose: Boolean = false) {
+class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
 
     private data class ProcessedDirs(val dir: Path, val parentDir: File)
     private data class ProcessedFile(val content: String, val fullname: String)
@@ -19,20 +20,20 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
     fun process(done: (Path?) -> Unit) {
         val path = processFile { filename, extension, content ->
             when (extension) {
-                "ktml" -> KTML(verbose).process(content)?.let {
+                "ktml" -> KTML(settings.verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.html")
                 }
-                "js" -> Script(Script.Type.javascript, verbose).process(content)?.let {
+                "js" -> Script(Script.Type.javascript, settings.verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.min.$extension")
                 }
-                "css" -> Script(Script.Type.stylesheet, verbose).process(content)?.let {
+                "css" -> Script(Script.Type.stylesheet, settings.verbose).process(content)?.let {
                     ProcessedFile(it, "$filename.min.$extension")
                 }
-                "md" -> Markdown().process(content)?.let {
+                "md" -> Markdown(settings).process(content)?.let {
                     ProcessedFile(it, "$filename.html")
                 }
                 else -> {
-                    if (verbose) {
+                    if (settings.verbose) {
                         println("ERROR: Unsupported content type $extension")
                     }
 
@@ -53,7 +54,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
     }
 
     private fun processFile(transform: (filename: String, extension: String, content: String) -> ProcessedFile?): Path? {
-        val (dir, parentDir) = getDirectories(changed.path, source, dest) ?: return null
+        val (dir, parentDir) = getDirectories(changed.path, settings.source, settings.destination) ?: return null
         val filename = dir.fileName.toString().split(".").firstOrNull() ?: return null
         val content = File(changed.path.toString()).readText()
         val result = transform(filename, changed.extension, content) ?: return null
@@ -64,7 +65,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val source: Path, val des
 
         val path = Paths.get(parentDir.toString(), result.fullname)
 
-        if (verbose) {
+        if (settings.verbose) {
             val origSize = humanReadableByteCount(content.length)
             val newSize = humanReadableByteCount(result.content.length)
             println("Compiled ${dir.fileName}, $origSize → $newSize")

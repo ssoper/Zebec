@@ -30,13 +30,13 @@ object Core {
         server.start()
 
         runBlocking {
-            watchFiles(settings.source, settings.destination, settings.extensions.toList(), server, settings.verbose)
+            watchFiles(settings, server)
         }
     }
 
-    suspend fun watchFiles(source: Path, dest: Path, extensions: List<String>, server: ContentServer, verbose: Boolean) {
+    suspend fun watchFiles(settings: Settings, server: ContentServer) {
         val watch = try {
-            WatchFile(listOf(source), extensions)
+            WatchFile(listOf(settings.source), settings.extensions.toList())
         } catch (exception: NoSuchFileException) {
             println("ERROR: watch argument invalid for ${exception.file}")
             exitProcess(1)
@@ -44,20 +44,20 @@ object Core {
 
         val channel = watch.createChannel()
 
-        if (verbose) {
+        if (settings.verbose) {
             watch.paths.forEach { println("Watching $it") }
-            println("Filtering on files with extensions ${extensions.joinToString()}")
+            println("Filtering on files with extensions ${settings.extensions.joinToString()}")
         }
 
         while (true) {
             val changed = channel.receive()
 
-            if (verbose) {
+            if (settings.verbose) {
                 println("Change detected at ${changed.path}")
             }
 
-            EventHandler(changed, source, dest, verbose).process {
-                if (verbose) {
+            EventHandler(changed, settings).process {
+                if (settings.verbose) {
                     it?.let {
                         println("Copied to $it")
                     } ?: println("Failed to compile")

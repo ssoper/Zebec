@@ -4,7 +4,6 @@ import com.seansoper.zebec.fileProcessor.Markdown
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import java.net.URL
 
 class MarkdownTest: StringSpec({
 
@@ -31,7 +30,7 @@ class MarkdownTest: StringSpec({
         val subtitle = "This is the subtitle"
         val image = "http://placekitten.com/900/300"
         val tags = "kotlin, programming,java"
-        val template = "blog.ktml"
+        val template = "blog"
         val source = """
             [//]: # (zauthor: $author)
             [//]: # (ztitle: $title)
@@ -42,7 +41,7 @@ class MarkdownTest: StringSpec({
             This is the **content**
         """.trimIndent()
 
-        val blog = Markdown().parseMetaData(source)!!
+        val blog = Markdown().parseMetadata(source)!!
         blog.author.shouldBe(author)
         blog.title.shouldBe(title)
         blog.imageURL!!.toString().shouldBe(image)
