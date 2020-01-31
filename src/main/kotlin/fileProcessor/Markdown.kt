@@ -18,12 +18,12 @@ import java.util.*
 
 class Markdown(val settings: Settings? = null): Processable {
 
-    data class Blog(val author: String,
-                    val title: String,
-                    val tags: Array<String>,
-                    val imageURL: URL?,
-                    val subtitle: String?,
-                    val template: String?) {
+    data class Metadata(val author: String,
+                        val title: String,
+                        val tags: Array<String>,
+                        val imageURL: URL?,
+                        val subtitle: String?,
+                        val template: String?) {
 
         fun html(createdDate: String): String {
             var result = "<h1 class='mt-4'>$title</h1>"
@@ -45,7 +45,7 @@ class Markdown(val settings: Settings? = null): Processable {
         }
     }
 
-    private data class ProcessedContent(val blog: Blog, val content: String, val createdDate: String)
+    private data class ProcessedContent(val metadata: Metadata, val content: String, val createdDate: String)
 
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
     private val Formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.US)
@@ -66,19 +66,19 @@ class Markdown(val settings: Settings? = null): Processable {
         } ?: html
     }
 
-    fun parseMetadata(content: String): Blog? {
+    fun parseMetadata(content: String): Metadata? {
         val author = parseAuthor(content)
         val title = parseTitle(content)
 
         return if (author != null && title != null) {
-            Blog(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content), parseTemplate(content))
+            Metadata(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content), parseTemplate(content))
         } else {
             null
         }
     }
 
-    private fun findTemplate(settings: Settings?, blog: Blog?): ProcessedContent? {
-        return blog?.let { blog ->
+    private fun findTemplate(settings: Settings?, metadata: Metadata?): ProcessedContent? {
+        return metadata?.let { blog ->
             blog.template?.let { template ->
                 settings?.templates?.get(template)?.let { path ->
                     if (settings.verbose) {

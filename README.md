@@ -24,7 +24,7 @@ Static site compiler. Written in Kotlin.
     * ✅ Surface test results and code coverage via badges
 * Blogging
     * ✅ Markdown
-    * Templating
+    * ✅ Templating
     * List entries
     * Filter entries by tag
     * Filter entries by author
