@@ -63,18 +63,11 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
     fun process(done: (Path?) -> Unit) {
         val path = processFile { docType, content ->
             when (docType) {
-                // TODO: Support Blog
+                DocType.BlogEntry -> BlogEntry(settings).process(content)
                 DocType.KTML -> KTML(settings.verbose).process(content)
                 DocType.JavaScript -> Script(Script.Type.javascript, settings.verbose).process(content)
                 DocType.Stylesheet -> Script(Script.Type.stylesheet, settings.verbose).process(content)
                 DocType.Markdown -> Markdown(settings).process(content)
-                else -> {
-                    if (settings.verbose) {
-                        println("ERROR: Unsupported content type")
-                    }
-
-                    null
-                }
             }
         }
 

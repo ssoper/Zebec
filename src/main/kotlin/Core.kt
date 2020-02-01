@@ -4,7 +4,6 @@ import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
 import java.nio.file.NoSuchFileException
-import java.nio.file.Path
 import kotlin.system.exitProcess
 
 object Core {
