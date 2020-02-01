@@ -16,13 +16,20 @@ interface Processable {
 
 class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
 
-    private data class ProcessedFile(val content: String, val fullname: String)
-
     private val destinationDirectory: File?
         get() {
             val relativeDestination = changed.path.toString().split(settings.source.toString()).elementAtOrNull(1) ?: return null
             val directory = Paths.get(settings.destination.toString(), relativeDestination)
             return File(directory.toString().replace("/./", "/")).parentFile
+        }
+
+    private val docType: DocType?
+        get() {
+            if (Blog(settings).isBlogEntry(changed)) {
+                return DocType.BlogEntry
+            }
+
+            return DocType.getFor(changed.extension)
         }
 
     enum class DocType {
@@ -32,34 +39,38 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
         Markdown,
         BlogEntry;
 
-        fun compiledFilename(filename: String): String? {
+        fun compiledFilename(filename: String): String {
             return when (this) {
                 KTML, Markdown, BlogEntry -> "$filename.html"
                 JavaScript -> "$filename.min.js"
                 Stylesheet -> "$filename.min.css"
             }
         }
+
+        companion object {
+            fun getFor(extension: String): DocType? {
+                return when (extension) {
+                    "ktml" -> KTML
+                    "js" -> JavaScript
+                    "css" -> Stylesheet
+                    "md" -> Markdown
+                    else -> null
+                }
+            }
+        }
     }
 
     fun process(done: (Path?) -> Unit) {
-        val path = processFile { filename, extension, content ->
-            when (extension) {
-                // TODO: Replace with Type
-                "ktml" -> KTML(settings.verbose).process(content)?.let {
-                    ProcessedFile(it, "$filename.html")
-                }
-                "js" -> Script(Script.Type.javascript, settings.verbose).process(content)?.let {
-                    ProcessedFile(it, "$filename.min.$extension")
-                }
-                "css" -> Script(Script.Type.stylesheet, settings.verbose).process(content)?.let {
-                    ProcessedFile(it, "$filename.min.$extension")
-                }
-                "md" -> Markdown(settings).process(content)?.let {
-                    ProcessedFile(it, "$filename.html")
-                }
+        val path = processFile { docType, content ->
+            when (docType) {
+                // TODO: Support Blog
+                DocType.KTML -> KTML(settings.verbose).process(content)
+                DocType.JavaScript -> Script(Script.Type.javascript, settings.verbose).process(content)
+                DocType.Stylesheet -> Script(Script.Type.stylesheet, settings.verbose).process(content)
+                DocType.Markdown -> Markdown(settings).process(content)
                 else -> {
                     if (settings.verbose) {
-                        println("ERROR: Unsupported content type $extension")
+                        println("ERROR: Unsupported content type")
                     }
 
                     null
@@ -70,31 +81,26 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
         done(path)
     }
 
-    private fun processFile(transform: (filename: String, extension: String, content: String) -> ProcessedFile?): Path? {
+    private fun processFile(transform: (docType: DocType, content: String) -> String?): Path? {
+        val docType = docType ?: return null
         val filename = changed.path.filenameNoExtension() ?: return null
         val destination = destinationDirectory ?: return null
         val content = File(changed.path.toString()).readText()
-
-        println(Blog(settings).isBlogEntry(changed))
-        println("@@@")
-
-        // TODO: Get parent dir path before calling transform
-        // TODO: Get type here
-        val result = transform(filename, changed.extension, content) ?: return null
+        val compiled = transform(docType, content) ?: return null
 
         if (!destination.exists()) {
             destination.mkdirs()
         }
 
-        val path = Paths.get(destination.toString(), result.fullname)
+        val path = Paths.get(destination.toString(), docType.compiledFilename(filename))
 
         if (settings.verbose) {
             val origSize = humanReadableByteCount(content.length)
-            val newSize = humanReadableByteCount(result.content.length)
+            val newSize = humanReadableByteCount(compiled.length)
             println("Compiled ${changed.path.fileName}, $origSize → $newSize")
         }
 
-        Files.write(path, result.content.toByteArray())
+        Files.write(path, compiled.toByteArray())
         return path
     }
 }
