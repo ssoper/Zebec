@@ -15,6 +15,10 @@ class IngestTest: StringSpec({
             destination = "dest"
             port = 9090
             extensions = arrayOf("txt", "html")
+            blog {
+                directory = "blog"
+                extension = "md"
+            }
         }
 
         config.source.toString().shouldBe("/test/path/src")
@@ -23,6 +27,8 @@ class IngestTest: StringSpec({
         config.extensions.contains("txt").shouldBeTrue()
         config.extensions.contains("html").shouldBeTrue()
         config.extensions.count().shouldBe(2)
+        config.blog!!.directory.toString().shouldBe("/test/path/blog")
+        config.blog!!.extension.shouldBe("md")
     }
 
     "default values" {

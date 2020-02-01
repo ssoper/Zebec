@@ -1,5 +1,7 @@
 package com.seansoper.zebec
 
+import java.nio.file.Path
+
 object Utilities {
 
     // Credit: https://stackoverflow.com/a/59234917
@@ -19,3 +21,5 @@ object Utilities {
     }
 
 }
+
+fun Path.filenameNoExtension(): String? = this.fileName.toString().split(".").firstOrNull()

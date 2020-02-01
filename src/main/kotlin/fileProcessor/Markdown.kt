@@ -57,6 +57,8 @@ class Markdown(val settings: Settings? = null): Processable {
         val blog = parseMetadata(content)
 
         // TODO: This needs to be abstracted out, Markdown tied too closely to a Blog
+        // TODO: Move into Blog class
+        // TODO: Attach template to Blog, remove from metadata
         return findTemplate(settings, blog)?.let { (blog, compiled, createdDate) ->
             var trimmed = html.
                 replace(Regex("</?body>"), "").
@@ -87,6 +89,8 @@ class Markdown(val settings: Settings? = null): Processable {
 
                     try {
                         val content = File(path.toString()).readText()
+
+                        // FIXME: Get created date of the file not the template
                         val createdDate = getCreatedDate(path) ?: defaultDate()
 
                         KTML(settings.verbose).process(content)?.let { compiled ->

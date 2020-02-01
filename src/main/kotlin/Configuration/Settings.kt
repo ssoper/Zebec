@@ -12,6 +12,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
     val port: Int
     val extensions: Array<String>
     val templates: Map<String, Path>?
+    val blog: BlogConfiguration?
     val verbose: Boolean
 
     private val configuration: Configuration
@@ -29,6 +30,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
         port = configuration.port
         extensions = configuration.extensions
         templates = configuration.templates
+        blog = configuration.blog
         verbose = parsed.verbose
     }
 }
