@@ -59,7 +59,6 @@ class KTMLParser {
         }
     }
 
-    // TODO: Use an enum for the type
     interface SupportsInputTag {
         fun inputTag(type: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
             attributes?.also {

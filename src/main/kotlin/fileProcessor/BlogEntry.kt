@@ -56,8 +56,6 @@ class BlogEntry(val settings: Settings? = null): Processable {
         val html = HtmlGenerator(content, parser, flavor).generateHtml()
         val blog = parseMetadata(content)
 
-        // TODO: This needs to be abstracted out, Markdown tied too closely to a Blog
-        // TODO: Move into Blog class
         // TODO: Attach template to Blog, remove from metadata
         return findTemplate(settings, blog)?.let { (blog, compiled, createdDate) ->
             var trimmed = html.
