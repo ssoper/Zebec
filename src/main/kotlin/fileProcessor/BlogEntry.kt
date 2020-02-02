@@ -60,7 +60,7 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
     private data class ProcessedContent(val metadata: Metadata, val content: String, val createdDate: String)
 
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
-    private val Formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.US)
+    private val Formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US)
 
     override fun process(content: String): String? {
         val html = Markdown().process(content) ?: return null
