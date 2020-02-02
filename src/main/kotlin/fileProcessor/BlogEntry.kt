@@ -1,18 +1,11 @@
 package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Blog
-import com.seansoper.zebec.configuration.Settings
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
-import org.intellij.markdown.html.HtmlGenerator
-import org.intellij.markdown.parser.MarkdownParser
-import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
-import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -57,8 +50,6 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
         }
     }
 
-    private data class ProcessedContent(val metadata: Metadata, val content: String, val createdDate: String)
-
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
     private val Formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US)
 
@@ -81,17 +72,6 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
         return if (author != null && title != null) {
             Metadata(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content))
         } else {
-            null
-        }
-    }
-
-    private fun getCreatedDate(path: Path): String? {
-        return try {
-            (Files.getAttribute(path, "creationTime") as FileTime).let {
-                val localDate = it.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime()
-                return localDate.format(Formatter)
-            }
-        } catch (exception: IOException) {
             null
         }
     }

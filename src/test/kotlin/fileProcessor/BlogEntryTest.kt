@@ -1,13 +1,9 @@
 package fileProcessor
 
-import com.seansoper.zebec.Blog
 import com.seansoper.zebec.CommandLineParser
 import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.BlogEntry
-import com.seansoper.zebec.fileProcessor.Markdown
 import io.kotlintest.matchers.boolean.shouldBeTrue
-import io.kotlintest.matchers.string.shouldContain
-import io.kotlintest.matchers.string.shouldNotContain
 import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
