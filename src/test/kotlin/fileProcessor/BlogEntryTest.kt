@@ -14,7 +14,7 @@ class BlogEntryTest: StringSpec({
     val pathURI = this.javaClass.classLoader.getResource("zebec.config")!!.toURI()
     val path = Paths.get(pathURI)
     val basePath = File(pathURI).parentFile.toPath()
-    val parsed = CommandLineParser.Parsed(path, true)
+    val parsed = CommandLineParser.Parsed(path, true, false)
     val settings = Settings(parsed, basePath.toString())
     val sampleFile = Paths.get(this.javaClass.classLoader.getResource("src/blog/entry.md")!!.toURI())
 

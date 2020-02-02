@@ -15,7 +15,7 @@ class SettingsTest: StringSpec({
     val basePath = File(pathURI).parentFile.toPath()
 
     "valid" {
-        val parsed = CommandLineParser.Parsed(path, true)
+        val parsed = CommandLineParser.Parsed(path, true, false)
         val settings = Settings(parsed, basePath.toString())
 
         settings.source.toString().shouldEndWith("/src")
