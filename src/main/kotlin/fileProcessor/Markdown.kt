@@ -16,7 +16,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class Markdown(val settings: Settings? = null): Processable {
+class Markdown(): Processable {
 
     override fun process(content: String): String? {
         val flavor = CommonMarkFlavourDescriptor()

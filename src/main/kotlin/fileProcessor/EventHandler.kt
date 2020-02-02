@@ -25,7 +25,9 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
 
     private val docType: DocType?
         get() {
-            if (Blog(settings).isBlogEntry(changed)) {
+            val blog = settings.blog ?: return null
+
+            if (blog.isBlogEntry(changed)) {
                 return DocType.BlogEntry
             }
 
@@ -63,11 +65,20 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
     fun process(done: (Path?) -> Unit) {
         val path = processFile { docType, content ->
             when (docType) {
-                DocType.BlogEntry -> BlogEntry(settings).process(content)
+                DocType.BlogEntry -> {
+                    settings.blog?.let {
+                        BlogEntry(it, changed.path, settings.verbose).process(content)
+                    } ?: run {
+                        if (settings.verbose) {
+                            println("Could not find blog configurtation")
+                            }
+                        null
+                    }
+                }
                 DocType.KTML -> KTML(settings.verbose).process(content)
                 DocType.JavaScript -> Script(Script.Type.javascript, settings.verbose).process(content)
                 DocType.Stylesheet -> Script(Script.Type.stylesheet, settings.verbose).process(content)
-                DocType.Markdown -> Markdown(settings).process(content)
+                DocType.Markdown -> Markdown().process(content)
             }
         }
 

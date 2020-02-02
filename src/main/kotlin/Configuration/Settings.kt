@@ -1,5 +1,6 @@
 package com.seansoper.zebec.configuration
 
+import com.seansoper.zebec.Blog
 import com.seansoper.zebec.CommandLineParser
 import java.io.File
 import java.nio.file.Path
@@ -11,8 +12,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
     val destination: Path
     val port: Int
     val extensions: Array<String>
-    val templates: Map<String, Path>?
-    val blog: BlogConfiguration?
+    val blog: Blog?
     val verbose: Boolean
 
     private val configuration: Configuration
@@ -29,8 +29,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
         destination = configuration.destination
         port = configuration.port
         extensions = configuration.extensions
-        templates = configuration.templates
-        blog = configuration.blog
         verbose = parsed.verbose
+        blog = configuration.blog?.let { Blog(it, verbose) }
     }
 }

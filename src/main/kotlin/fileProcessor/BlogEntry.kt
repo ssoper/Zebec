@@ -1,5 +1,6 @@
 package com.seansoper.zebec.fileProcessor
 
+import com.seansoper.zebec.Blog
 import com.seansoper.zebec.configuration.Settings
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
@@ -16,14 +17,25 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class BlogEntry(val settings: Settings? = null): Processable {
+class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false): Processable {
+
+    val createdDate: String?
+        get() {
+            return try {
+                (Files.getAttribute(source, "creationTime") as FileTime).let {
+                    val localDate = it.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime()
+                    return localDate.format(Formatter)
+                }
+            } catch (exception: IOException) {
+                null
+            }
+        }
 
     data class Metadata(val author: String,
                         val title: String,
                         val tags: Array<String>,
                         val imageURL: URL?,
-                        val subtitle: String?,
-                        val template: String?) {
+                        val subtitle: String?) {
 
         fun html(createdDate: String): String {
             var result = "<h1 class='mt-4'>$title</h1>"
@@ -51,19 +63,15 @@ class BlogEntry(val settings: Settings? = null): Processable {
     private val Formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.US)
 
     override fun process(content: String): String? {
-        val flavor = CommonMarkFlavourDescriptor()
-        val parser = MarkdownParser(flavor).buildMarkdownTreeFromString(content)
-        val html = HtmlGenerator(content, parser, flavor).generateHtml()
-        val blog = parseMetadata(content)
+        val html = Markdown().process(content) ?: return null
+        val metadata = parseMetadata(content) ?: return null
+        val createdDate = createdDate ?: return null
+        var trimmed = html.
+            replace(Regex("</?body>"), "").
+            replace("<pre><code>", "<pre><code>\n")
+        trimmed = "${metadata.html(createdDate)}$trimmed"
 
-        // TODO: Attach template to Blog, remove from metadata
-        return findTemplate(settings, blog)?.let { (blog, compiled, createdDate) ->
-            var trimmed = html.
-                replace(Regex("</?body>"), "").
-                replace("<pre><code>", "<pre><code>\n")
-            trimmed = "${blog.html(createdDate)}$trimmed"
-            return compiled.replace("<zebeccontent />", trimmed)
-        } ?: html
+        return blog.template.compiled.replace("<zebeccontent />", trimmed)
     }
 
     fun parseMetadata(content: String): Metadata? {
@@ -71,35 +79,9 @@ class BlogEntry(val settings: Settings? = null): Processable {
         val title = parseTitle(content)
 
         return if (author != null && title != null) {
-            Metadata(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content), parseTemplate(content))
+            Metadata(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content))
         } else {
             null
-        }
-    }
-
-    private fun findTemplate(settings: Settings?, metadata: Metadata?): ProcessedContent? {
-        return metadata?.let { blog ->
-            blog.template?.let { template ->
-                settings?.templates?.get(template)?.let { path ->
-                    if (settings.verbose) {
-                        println("Using template $template")
-                    }
-
-                    try {
-                        val content = File(path.toString()).readText()
-
-                        // FIXME: Get created date of the file not the template
-                        val createdDate = getCreatedDate(path) ?: defaultDate()
-
-                        KTML(settings.verbose).process(content)?.let { compiled ->
-                            ProcessedContent(blog, compiled, createdDate)
-                        }
-                    } catch (exception: FileNotFoundException) {
-                        println("Could not find template file $template")
-                        null
-                    }
-                }
-            }
         }
     }
 
@@ -114,11 +96,6 @@ class BlogEntry(val settings: Settings? = null): Processable {
         }
     }
 
-    private fun defaultDate(): String {
-        val localDate = Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime()
-        return localDate.format(Formatter)
-    }
-
     private fun parseAuthor(content: String): String? {
         val regex = Regex("^\\[//]: # \\(zauthor: ([a-z]+(([’',. -][a-z ])?[a-z]*)*)\\)$", setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE))
         return regex.find(content)?.groups?.get(1)?.value
@@ -131,11 +108,6 @@ class BlogEntry(val settings: Settings? = null): Processable {
 
     private fun parseSubtitle(content: String): String? {
         val regex = Regex("^\\[//]: # \\(zsubtitle: $TitleRegex\\)$", setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE))
-        return regex.find(content)?.groups?.get(1)?.value
-    }
-
-    private fun parseTemplate(content: String): String? {
-        val regex = Regex("^\\[//]: # \\(ztemplate: ([^\\s]+)\\)$", setOf(RegexOption.MULTILINE, RegexOption.IGNORE_CASE))
         return regex.find(content)?.groups?.get(1)?.value
     }
 
