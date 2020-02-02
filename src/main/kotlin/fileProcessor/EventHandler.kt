@@ -1,6 +1,5 @@
 package com.seansoper.zebec.fileProcessor
 
-import com.seansoper.zebec.Blog
 import com.seansoper.zebec.Utilities.humanReadableByteCount
 import com.seansoper.zebec.WatchFile
 import com.seansoper.zebec.configuration.Settings
@@ -52,11 +51,11 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
         companion object {
             fun getFor(extension: String): DocType? {
                 return when (extension) {
-                    "ktml" -> KTML
-                    "js" -> JavaScript
-                    "css" -> Stylesheet
-                    "md" -> Markdown
-                    else -> null
+                    "ktml"  -> KTML
+                    "js"    -> JavaScript
+                    "css"   -> Stylesheet
+                    "md"    -> Markdown
+                    else    -> null
                 }
             }
         }
@@ -71,7 +70,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
                     } ?: run {
                         if (settings.verbose) {
                             println("Could not find blog configurtation")
-                            }
+                        }
                         null
                     }
                 }
