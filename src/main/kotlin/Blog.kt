@@ -2,7 +2,6 @@ package com.seansoper.zebec
 
 import com.seansoper.zebec.configuration.BlogConfiguration
 import com.seansoper.zebec.configuration.Settings
-import com.seansoper.zebec.fileProcessor.BlogEntry
 import com.seansoper.zebec.fileProcessor.EventHandler
 import com.seansoper.zebec.fileProcessor.KTML
 import java.io.File

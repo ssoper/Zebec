@@ -135,13 +135,18 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
         }
     }
 
-    // FIXME: localhost:8080 works but localhost:8080/blog fails when it should return /index.html
-    // TODO: Add more logging around failure to find content
+    private fun isDirectory(requestURI: URI): Boolean {
+        val lastComponent = requestURI.path.split("/").lastOrNull()?.split(".") ?: return false
+        return lastComponent.count() == 1
+    }
+
     private fun parse(requestURI: URI, logger: RequestLogger?): ContentResponse? {
         val path = if (requestURI.path.endsWith("/")) {
             "$basePath${requestURI.path}index.html"
+        } else if (isDirectory(requestURI)) {
+            "$basePath${requestURI.path}/index.html"
         } else {
-           "$basePath${requestURI.path}"
+            "$basePath${requestURI.path}"
         }
 
         logger?.add("Path: $path")
