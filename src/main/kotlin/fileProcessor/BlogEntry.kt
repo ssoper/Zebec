@@ -45,10 +45,18 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
                 </div>
             """.trimIndent()
 
-            imageURL?.let { result += "<img class='img-fluid rounded' src='$imageURL' />" }
+            imageURL?.let {
+                val url = getRelativeProtocol(it)
+                result += "<img class='img-fluid rounded' src='$url' />"
+            }
 
             return result
         }
+
+        fun getRelativeProtocol(url: URL): String {
+            return "//${url.host}${url.file}"
+        }
+
     }
 
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
