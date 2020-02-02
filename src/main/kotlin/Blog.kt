@@ -1,11 +1,15 @@
 package com.seansoper.zebec
 
 import com.seansoper.zebec.configuration.BlogConfiguration
+import com.seansoper.zebec.configuration.Settings
+import com.seansoper.zebec.fileProcessor.BlogEntry
+import com.seansoper.zebec.fileProcessor.EventHandler
 import com.seansoper.zebec.fileProcessor.KTML
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.streams.toList
 
 class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
 
@@ -29,15 +33,15 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         }
     }
 
-    fun recompile() {
-        val files = Files.walk(directory, 1).filter {
+    fun recompile(settings: Settings) {
+        val paths = Files.walk(directory, 1).filter {
             val file = it.toFile()
             !file.isDirectory && file.extension == extension
-        }
+        }.toList()
 
-        val suffix = "found in ${directory} with ${extension}"
+        val suffix = "found in $directory with extension $extension"
 
-        if (files.count() < 1) {
+        if (paths.count() < 1) {
             if (verbose) {
                 println("Zero files $suffix")
             }
@@ -46,10 +50,19 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         }
 
         if (verbose) {
-            println("${files.count()} files found in $suffix")
+            println("${paths.count()} files $suffix")
         }
 
-
+        paths.forEach { path ->
+            val file = WatchFile.ChangedFile(path, extension)
+            EventHandler(file, settings).process {
+                if (settings.verbose) {
+                    it?.let {
+                        println("Compiled $path to $it")
+                    } ?: println("Failed to compile $path")
+                }
+            }
+        }
     }
 
     fun isBlogEntry(changedFile: WatchFile.ChangedFile): Boolean {

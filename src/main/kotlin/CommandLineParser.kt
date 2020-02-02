@@ -9,7 +9,9 @@ class CommandLineParser(private val args: Array<String>,
 
     val shouldShowHelp: Boolean = args.any { it == "-help" }
 
-    data class Parsed(val pathToConfigFile: Path, val verbose: Boolean)
+    data class Parsed(val pathToConfigFile: Path,
+                      val verbose: Boolean,
+                      val recompile: Boolean)
 
     fun showHelp() {
         val str = """
@@ -17,6 +19,7 @@ class CommandLineParser(private val args: Array<String>,
 
                 -help                   Show documentation
                 -config=path            Path to configuration file, default is ./zebec.config
+                -recompile=true         Recompile the files instead of running the service
                 -verbose=true           Show debugging output, default is false
         """.trimIndent()
         println(str)
@@ -30,8 +33,9 @@ class CommandLineParser(private val args: Array<String>,
         }
 
         val verbose = getVerbose()
+        val recompile = getRecompile()
 
-        return Parsed(pathToConfigFile, verbose)
+        return Parsed(pathToConfigFile, verbose, recompile)
     }
 
     private fun<T: Any> parseArguments(regex: Regex, transform: (String) -> T): List<T> {
@@ -65,6 +69,11 @@ class CommandLineParser(private val args: Array<String>,
                 Paths.get(basePath, it)
             }
         }.firstOrNull()
+    }
+
+    private fun getRecompile(): Boolean {
+        val regex = Regex("^-recompile=(\\w+)")
+        return parseArguments(regex) { it == "true" }.isNotEmpty()
     }
 
 }

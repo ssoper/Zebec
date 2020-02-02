@@ -1,6 +1,7 @@
 package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Blog
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files

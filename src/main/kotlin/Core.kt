@@ -25,6 +25,16 @@ object Core {
 
         val settings = Settings(parsed, System.getProperty("user.dir"))
 
+        if (parsed.recompile) {
+            val blog = settings.blog ?: run {
+                println("ERROR: Recompile flag passed but no blog configuration found")
+                exitProcess(1)
+            }
+
+            blog.recompile(settings)
+            exitProcess(0)
+        }
+
         val server = ContentServer(settings.destination, settings.port, settings.verbose)
         server.start()
 
