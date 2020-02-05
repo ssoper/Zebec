@@ -25,13 +25,12 @@ Static site compiler. Written in Kotlin.
 * Blogging
     * ✅ Markdown
     * ✅ Templating
-    * List entries
+    * ✅ List entries
     * [Unsplash](https://unsplash.com/documentation#supported-parameters)
-    * Fix created date value
     * Support [srcset](http://thenewcode.com/944/Responsive-Images-For-Retina-Using-srcset-and-the-x-Designator)
     * Filter entries by tag
-    * Filter entries by author
     * Social Media [tags](https://blog.hubspot.com/marketing/open-graph-tags-facebook-twitter-linkedin)
+    * Add ability to override published date in metadata
 * Generate site files
     * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)

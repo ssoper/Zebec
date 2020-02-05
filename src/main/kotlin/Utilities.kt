@@ -1,6 +1,12 @@
 package com.seansoper.zebec
 
+import java.io.IOException
+import java.net.URL
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 object Utilities {
 
@@ -23,3 +29,18 @@ object Utilities {
 }
 
 fun Path.filenameNoExtension(): String? = this.fileName.toString().split(".").firstOrNull()
+
+val Path.createdDate: LocalDateTime?
+    get() {
+        return try {
+            (Files.getAttribute(this, "creationTime") as FileTime).
+                toInstant().
+                atOffset(ZoneOffset.UTC).
+                toLocalDateTime()
+        } catch (exception: IOException) {
+            null
+        }
+    }
+
+val URL.relativeProtocol: String
+    get() = "//${this.host}${this.file}"

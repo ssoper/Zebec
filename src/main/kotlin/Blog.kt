@@ -2,12 +2,17 @@ package com.seansoper.zebec
 
 import com.seansoper.zebec.configuration.BlogConfiguration
 import com.seansoper.zebec.configuration.Settings
+import com.seansoper.zebec.fileProcessor.BlogEntry
 import com.seansoper.zebec.fileProcessor.EventHandler
 import com.seansoper.zebec.fileProcessor.KTML
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.streams.toList
 
 class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
@@ -15,7 +20,30 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
     val directory: Path = configuration.directory
     val extension: String = configuration.extension
 
-    data class Template(val path: Path, val raw: String, val compiled: String)
+    data class Template(val path: Path, val raw: String, val compiled: String) {
+        fun render(content: String): String {
+            return compiled.replace("<zebeccontent />", content)
+        }
+    }
+
+    data class Entry(val filePath: Path, val relativePath: String, val createdDate: LocalDateTime, val metadata: BlogEntry.Metadata) {
+        fun html(): String {
+            val image = metadata.imageURL?.let {
+                "<img class='card-img-top' src='${it.relativeProtocol}'>"
+            } ?: ""
+
+            return """
+                <div class='card mb-4'>
+                    $image
+                    <div class='card-body p-3'>
+                      <h5 class='card-title m-0'>${metadata.title}</h5>
+                      <p class='card-text'>${metadata.firstParagraph}</p>
+                      <a href='${relativePath}' class='stretched-link'></a>
+                    </div>
+                  </div>
+            """.trimIndent()
+        }
+    }
 
     lateinit var template: Template
 
@@ -52,15 +80,48 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
             println("${paths.count()} files $suffix")
         }
 
+        var entries = emptyArray<Entry>()
+        val now = Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime()
+
         paths.forEach { path ->
             val file = WatchFile.ChangedFile(path, extension)
+            val metadata = BlogEntry(this, path, verbose).getMetadata() ?: return@forEach
+            val relativePath = relativeDestinationDir(settings.source, path) ?: return@forEach
+
             EventHandler(file, settings).process {
-                if (settings.verbose) {
-                    it?.let {
+                it?.let {
+                    if (verbose) {
                         println("Compiled $path to $it")
-                    } ?: println("Failed to compile $path")
+                    }
+
+                    val createdDate = path.createdDate ?: now
+                    entries += Entry(it, relativePath, createdDate, metadata)
+                } ?: run {
+                    if (verbose) {
+                        println("Failed to compile $path")
+                    }
                 }
             }
+        }
+
+        val path = entries.firstOrNull()?.filePath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
+
+        var count = 0
+        var html = "<div class='card-deck mt-4'>"
+        entries.sortedBy { it.createdDate }.forEach {
+            html += "\n${it.html()}"
+            if (++count % 2 == 0) {
+                html += "\n<div class='w-100 d-none d-sm-block d-md-block'></div>"
+            }
+        }
+
+        html += "\n</div>"
+        val result = template.render(html)
+
+        Files.write(path, result.toByteArray())
+
+        if (verbose) {
+            println("Wrote $path with ${entries.count()} entries")
         }
     }
 
@@ -69,6 +130,19 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
 
         return (directory == directory &&
                 extension == changedFile.extension)
+    }
+
+    private fun relativeDestinationDir(source: Path, changed: Path): String? {
+        val dir = changed.toString().split(source.toString()).elementAtOrNull(1) ?: return null
+        val path = dir.
+            replace("/./", "/").
+            replace(Regex(".\\w+$"), ".html")
+
+        return if (path.startsWith("/")) {
+            path
+        } else {
+            "/${path}"
+        }
     }
 
 }

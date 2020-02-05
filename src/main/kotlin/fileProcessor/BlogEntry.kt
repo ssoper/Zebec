@@ -1,25 +1,27 @@
 package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Blog
+import com.seansoper.zebec.relativeProtocol
 import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false): Processable {
 
-    val createdDate: String?
+    val createdDate: LocalDateTime?
         get() {
             return try {
-                (Files.getAttribute(source, "creationTime") as FileTime).let {
-                    val localDate = it.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime()
-                    return localDate.format(Formatter)
-                }
+                (Files.getAttribute(source, "creationTime") as FileTime).
+                    toInstant().
+                    atOffset(ZoneOffset.UTC).
+                    toLocalDateTime()
             } catch (exception: IOException) {
                 null
             }
@@ -29,7 +31,8 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
                         val title: String,
                         val tags: Array<String>,
                         val imageURL: URL?,
-                        val subtitle: String?) {
+                        val subtitle: String?,
+                        val firstParagraph: String?) {
 
         fun html(createdDate: String): String {
             var result = "<h1 class='mt-4'>$title</h1>"
@@ -46,17 +49,11 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
             """.trimIndent()
 
             imageURL?.let {
-                val url = getRelativeProtocol(it)
-                result += "<img class='img-fluid rounded' src='$url' />"
+                result += "<img class='img-fluid rounded' src='${it.relativeProtocol}' />"
             }
 
             return result
         }
-
-        fun getRelativeProtocol(url: URL): String {
-            return "//${url.host}${url.file}"
-        }
-
     }
 
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
@@ -65,13 +62,13 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
     override fun process(content: String): String? {
         val html = Markdown().process(content) ?: return null
         val metadata = parseMetadata(content) ?: return null
-        val createdDate = createdDate ?: return null
+        val formattedDate = createdDate?.format(Formatter) ?: return null
         var trimmed = html.
             replace(Regex("</?body>"), "").
             replace("<pre><code>", "<pre><code>\n")
-        trimmed = "${metadata.html(createdDate)}$trimmed"
+        trimmed = "${metadata.html(formattedDate)}$trimmed"
 
-        return blog.template.compiled.replace("<zebeccontent />", trimmed)
+        return blog.template.render(trimmed)
     }
 
     fun parseMetadata(content: String): Metadata? {
@@ -79,10 +76,20 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
         val title = parseTitle(content)
 
         return if (author != null && title != null) {
-            Metadata(author, title, parseTags(content), parseImageURL(content), parseSubtitle(content))
+            Metadata(author,
+                     title,
+                     parseTags(content),
+                     parseImageURL(content),
+                     parseSubtitle(content),
+                     Markdown().getFirstParagraph((content)))
         } else {
             null
         }
+    }
+
+    fun getMetadata(): Metadata? {
+        val content = File(source.toString()).readText()
+        return parseMetadata(content)
     }
 
     private fun parseAuthor(content: String): String? {
