@@ -26,7 +26,7 @@ Static site compiler. Written in Kotlin.
     * ✅ Markdown
     * ✅ Templating
     * ✅ List entries
-    * [Unsplash](https://unsplash.com/documentation#supported-parameters)
+    * ✅ [Unsplash](https://source.unsplash.com/)
     * Support [srcset](http://thenewcode.com/944/Responsive-Images-For-Retina-Using-srcset-and-the-x-Designator)
     * Filter entries by tag
     * Social Media [tags](https://blog.hubspot.com/marketing/open-graph-tags-facebook-twitter-linkedin)

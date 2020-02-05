@@ -60,6 +60,8 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         }
     }
 
+    // TODO: Remove dependence on having HTML code mixed with Kotlin
+    // TODO: Break up into smaller components
     fun recompile(settings: Settings) {
         val paths = Files.walk(directory, 1).filter {
             val file = it.toFile()
@@ -132,6 +134,7 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
                 extension == changedFile.extension)
     }
 
+    // TODO: This shares some functionality with EventHandler.processFile, consider consolidating
     private fun relativeDestinationDir(source: Path, changed: Path): String? {
         val dir = changed.toString().split(source.toString()).elementAtOrNull(1) ?: return null
         val path = dir.

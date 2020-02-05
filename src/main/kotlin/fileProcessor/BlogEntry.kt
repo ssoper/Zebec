@@ -1,6 +1,8 @@
 package com.seansoper.zebec.fileProcessor
 
 import com.seansoper.zebec.Blog
+import com.seansoper.zebec.InvalidUnsplashURL
+import com.seansoper.zebec.UnsplashImage
 import com.seansoper.zebec.relativeProtocol
 import java.io.File
 import java.io.IOException
@@ -31,6 +33,7 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
                         val title: String,
                         val tags: Array<String>,
                         val imageURL: URL?,
+                        val image: UnsplashImage?,
                         val subtitle: String?,
                         val firstParagraph: String?) {
 
@@ -48,7 +51,9 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
                 </div>
             """.trimIndent()
 
-            imageURL?.let {
+            image?.let {
+                result += "<img class='img-fluid rounded' src='${it.entryUrlNormal}' />"
+            } ?: imageURL?.let {
                 result += "<img class='img-fluid rounded' src='${it.relativeProtocol}' />"
             }
 
@@ -76,10 +81,20 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
         val title = parseTitle(content)
 
         return if (author != null && title != null) {
+            val imageURL = parseImageURL(content)
+            val image = imageURL?.let {
+                try {
+                    UnsplashImage(imageURL)
+                } catch (exception: InvalidUnsplashURL) {
+                    null
+                }
+            }
+
             Metadata(author,
                      title,
                      parseTags(content),
-                     parseImageURL(content),
+                     imageURL,
+                     image,
                      parseSubtitle(content),
                      Markdown().getFirstParagraph((content)))
         } else {
