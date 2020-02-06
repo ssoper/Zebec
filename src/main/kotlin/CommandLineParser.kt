@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
+// TODO: Remove unnecessary true/false flags for arguments
 class CommandLineParser(private val args: Array<String>,
                         private val basePath: String = System.getProperty("user.dir")) {
 

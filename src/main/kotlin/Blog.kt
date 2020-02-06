@@ -28,8 +28,10 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
 
     data class Entry(val filePath: Path, val relativePath: String, val createdDate: LocalDateTime, val metadata: BlogEntry.Metadata) {
         fun html(): String {
-            val image = metadata.imageURL?.let {
-                "<img class='card-img-top' src='${it.relativeProtocol}'>"
+            val image = metadata.image?.let {
+                "<img class='card-img-top' src='${it.previewUrlNormal}' srcset='${it.previewUrlNormal} 1x, ${it.previewUrlRetina} 2x' />"
+            } ?: metadata.imageURL?.let {
+                "<img class='card-img-top' src='${it.relativeProtocol}' />"
             } ?: ""
 
             return """

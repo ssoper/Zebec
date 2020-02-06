@@ -27,8 +27,8 @@ Static site compiler. Written in Kotlin.
     * ✅ Templating
     * ✅ List entries
     * ✅ [Unsplash](https://source.unsplash.com/)
-    * Support [srcset](http://thenewcode.com/944/Responsive-Images-For-Retina-Using-srcset-and-the-x-Designator)
-    * Filter entries by tag
+    * ✅ Support [srcset](http://thenewcode.com/944/Responsive-Images-For-Retina-Using-srcset-and-the-x-Designator)
+    * Filter entries by category
     * Social Media [tags](https://blog.hubspot.com/marketing/open-graph-tags-facebook-twitter-linkedin)
     * Add ability to override published date in metadata
 * Generate site files

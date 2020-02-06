@@ -29,6 +29,7 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
             }
         }
 
+    // TODO: Combine image and imageURL
     data class Metadata(val author: String,
                         val title: String,
                         val tags: Array<String>,
@@ -52,7 +53,7 @@ class BlogEntry(val blog: Blog, val source: Path, val verbose: Boolean = false):
             """.trimIndent()
 
             image?.let {
-                result += "<img class='img-fluid rounded' src='${it.entryUrlNormal}' />"
+                result += "<img class='img-fluid rounded' src='${it.entryUrlNormal}' srcset='${it.entryUrlNormal} 1x, ${it.entryUrlRetina} 2x'>"
             } ?: imageURL?.let {
                 result += "<img class='img-fluid rounded' src='${it.relativeProtocol}' />"
             }
