@@ -5,12 +5,25 @@ import java.nio.file.Paths
 
 data class BlogConfiguration(val directory: Path,
                              val extension: String,
-                             val template: Path)
+                             val template: Path) {
+    companion object {
+
+        fun fromIngestible(basePath: String, ingest: Ingest.BlogIngestible): BlogConfiguration? {
+            val directory = ingest.directory?.let { Paths.get(basePath, it) } ?: return null
+            val extension = ingest.extension ?: return null
+            val template = ingest.template?.let { Paths.get(basePath, it) } ?: return null
+
+            return BlogConfiguration(directory, extension, template)
+        }
+
+    }
+}
 
 data class Configuration(val source: Path,
                          val destination: Path,
                          val port: Int,
                          val extensions: Array<String>,
+                         val host: String?,
                          val blog: BlogConfiguration?)
 
 class Ingest(val basePath: String) {
@@ -24,13 +37,14 @@ class Ingest(val basePath: String) {
         var destination: String? = null
         var port: Int? = null
         var extensions: Array<String>? = null
-        var blogConfig: BlogIngestible? = null
+        var host: String? = null
+        var blogIngest: BlogIngestible? = null
 
         fun blog(block: BlogIngestible.() -> Unit) {
             val config = BlogIngestible()
             config.block()
 
-            blogConfig = BlogIngestible(config.directory, config.extension, config.template)
+            blogIngest = BlogIngestible(config.directory, config.extension, config.template)
         }
     }
 
@@ -48,16 +62,9 @@ class Ingest(val basePath: String) {
         } ?: Paths.get(basePath, ".")
         val port = config.port ?: 8080
         val extensions = config.extensions ?: arrayOf("css", "js", "ktml", "md")
-        val blog = config.blogConfig?.directory?.let { directory ->
-            config.blogConfig?.extension?.let { extension ->
-                config.blogConfig?.template?.let {
-                    val template = Paths.get(basePath, it)
-                    BlogConfiguration(Paths.get(basePath, directory), extension, template)
-                }
-            }
-        }
+        val blog = config.blogIngest?.let { BlogConfiguration.fromIngestible(basePath, it) }
 
-        return Configuration(source, destination, port, extensions, blog)
+        return Configuration(source, destination, port, extensions, config.host, blog)
     }
 
 }

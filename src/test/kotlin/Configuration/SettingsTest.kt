@@ -24,6 +24,7 @@ class SettingsTest: StringSpec({
         settings.extensions.contains("jpg").shouldBeTrue()
         settings.extensions.contains("pdf").shouldBeTrue()
         settings.extensions.count().shouldBe(2)
+        settings.host.shouldBe("mygreatsite.com")
         settings.verbose.shouldBeTrue()
         settings.blog!!.directory.toString().shouldEndWith("/blog")
         settings.blog!!.extension.shouldBe("md")

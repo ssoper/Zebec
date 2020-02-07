@@ -12,6 +12,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
     val destination: Path
     val port: Int
     val extensions: Array<String>
+    val host: String?
     val blog: Blog?
     val verbose: Boolean
 
@@ -29,6 +30,7 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
         destination = configuration.destination
         port = configuration.port
         extensions = configuration.extensions
+        host = configuration.host
         verbose = parsed.verbose
         blog = configuration.blog?.let { Blog(it, verbose) }
     }
