@@ -46,15 +46,20 @@ class KTMLParser {
         }
     }
 
-    // TODO: Coalesce this and the script tag
+    // TODO: Coalesce image, script and other similar tags
     interface SupportsImageTag {
         fun imageTag(src: String, attributes: TagAttributes? = null, addTag: (TagAttributes) -> Unit) {
             attributes?.also {
                 val finalAttrs = it.toMutableMap()
                 finalAttrs["src"] = src
+
+                if (!finalAttrs.containsKey("alt")) {
+                    finalAttrs["alt"] = ""
+                }
+
                 addTag(finalAttrs)
             } ?: run {
-                addTag(mapOf("src" to src))
+                addTag(mapOf("src" to src, "alt" to ""))
             }
         }
     }

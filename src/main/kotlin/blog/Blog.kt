@@ -61,7 +61,7 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         }
 
         var entries = emptyArray<BlogEntryMetadata>()
-        var blogPath: Path? = null
+        var compiledBlogPath: Path? = null
 
         paths.forEach { path ->
             val file = WatchFile.ChangedFile(path, extension)
@@ -77,8 +77,8 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
                         println("Compiled $path to $it")
                     }
 
-                    if (blogPath == null) {
-                        blogPath = it
+                    if (compiledBlogPath == null) {
+                        compiledBlogPath = it
                     }
 
                     entries += metadata
@@ -90,22 +90,21 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
             }
         }
 
-        val relativePath = blogPath?.let { relativeDestinationDir(settings.source, it) } ?: return
-        val indexPath = blogPath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
-
         var count = 0
         var html = "<div class='card-deck mt-4'>"
 
-        entries.sortedBy { it.createdDate }.forEach {
-            html += "\n${it.previewHtml(relativePath)}"
+        entries.sortedBy { it.createdDate }.forEach { metadata ->
+            val relativePath = compiledBlogPath?.let { relativePath(settings.source, it) } ?: return@forEach
+            html += "\n${metadata.previewHtml(relativePath)}"
             if (++count % 2 == 0) {
                 html += "\n<div class='w-100 d-none d-sm-block d-md-block'></div>"
             }
         }
 
         html += "\n</div>"
-        val result = template.render(html)
 
+        val result = template.render(html)
+        val indexPath = compiledBlogPath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
         Files.write(indexPath, result.toByteArray())
 
         if (verbose) {
@@ -121,11 +120,9 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
     }
 
     // TODO: This shares some functionality with EventHandler.processFile, consider consolidating
-    private fun relativeDestinationDir(source: Path, changed: Path): String? {
-        val dir = changed.toString().split(source.toString()).elementAtOrNull(1) ?: return null
-        val path = dir.
-            replace("/./", "/").
-            replace(Regex(".\\w+$"), ".html")
+    private fun relativePath(source: Path, compiledBlogPath: Path): String? {
+        val prefix = source.toString().commonPrefixWith(compiledBlogPath.toString())
+        val path = compiledBlogPath.toString().removePrefix(prefix).replace("/./", "/")
 
         return if (path.startsWith("/")) {
             path

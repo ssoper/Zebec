@@ -44,7 +44,7 @@ class BlogEntryMetadata(val path: Path) {
 
             result += """
                     <div class='author'>
-                      <img src='/images/avatar.jpg' />
+                      <img src='/images/avatar.jpg' alt='' />
                       <ul>
                         <li>$author</li>
                         <li>$createdDate</li>
@@ -53,7 +53,7 @@ class BlogEntryMetadata(val path: Path) {
                 """.trimIndent()
 
             image?.let {
-                result += "<img class='img-fluid rounded' ${it.imageHtmlAttributes(BlogImage.Type.Entry)}>"
+                result += "<img class='img-fluid rounded' alt='' ${it.imageHtmlAttributes(BlogImage.Type.Entry)}>"
             }
 
             return result
@@ -75,7 +75,7 @@ class BlogEntryMetadata(val path: Path) {
 
     fun previewHtml(relativePath: String): String {
         val image = image?.let {
-            "<img class='card-img-top' ${it.imageHtmlAttributes(BlogImage.Type.Preview)} />"
+            "<img class='card-img-top' alt='' ${it.imageHtmlAttributes(BlogImage.Type.Preview)} />"
         } ?: ""
 
         return """
