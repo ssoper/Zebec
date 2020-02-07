@@ -41,23 +41,14 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
     // TODO: Remove dependence on having HTML code mixed with Kotlin
     // TODO: Break up into smaller components
     fun recompile(settings: Settings) {
-        val paths = Files.walk(directory, 1).filter {
-            val file = it.toFile()
-            !file.isDirectory && file.extension == extension
-        }.toList()
-
-        val suffix = "found in $directory with extension $extension"
-
-        if (paths.count() < 1) {
-            if (verbose) {
-                println("Zero files $suffix")
-            }
-
-            return
-        }
+        val paths = getPaths()
 
         if (verbose) {
-            println("${paths.count()} files $suffix")
+            println("Found ${paths.count()} files in $directory with extension $extension")
+        }
+
+        if (paths.count() < 1) {
+            return
         }
 
         var entries = emptyArray<BlogEntryMetadata>()
@@ -129,6 +120,13 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         } else {
             "/${path}"
         }
+    }
+
+    private fun getPaths(): List<Path> {
+        return Files.walk(directory, 1).filter {
+            val file = it.toFile()
+            !file.isDirectory && file.extension == extension
+        }.toList()
     }
 
 }
