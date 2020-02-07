@@ -46,7 +46,7 @@ class BlogEntryMetadata(val path: Path) {
                       <img src='/images/avatar.jpg' alt='' />
                       <ul>
                         <li>$author</li>
-                        <li>$createdDate</li>
+                        <li>${createdDate.format(Formatter)}</li>
                       </ul>
                     </div>
                 """.trimIndent()
