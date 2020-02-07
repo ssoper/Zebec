@@ -2,7 +2,6 @@ package com.seansoper.zebec.blog
 
 import com.seansoper.zebec.fileProcessor.Markdown
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
