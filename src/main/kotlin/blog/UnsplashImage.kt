@@ -1,4 +1,4 @@
-package com.seansoper.zebec
+package com.seansoper.zebec.blog
 
 import java.lang.Exception
 import java.net.URL

@@ -1,5 +1,5 @@
-import com.seansoper.zebec.InvalidUnsplashURL
-import com.seansoper.zebec.UnsplashImage
+import com.seansoper.zebec.blog.InvalidUnsplashURL
+import com.seansoper.zebec.blog.UnsplashImage
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec

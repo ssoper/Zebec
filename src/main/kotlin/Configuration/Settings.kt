@@ -1,7 +1,7 @@
 package com.seansoper.zebec.configuration
 
-import com.seansoper.zebec.Blog
 import com.seansoper.zebec.CommandLineParser
+import com.seansoper.zebec.blog.Blog
 import java.io.File
 import java.nio.file.Path
 import javax.script.ScriptEngineManager

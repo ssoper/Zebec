@@ -1,8 +1,8 @@
-package com.seansoper.zebec
+package com.seansoper.zebec.blog
 
+import com.seansoper.zebec.WatchFile
 import com.seansoper.zebec.configuration.BlogConfiguration
 import com.seansoper.zebec.configuration.Settings
-import com.seansoper.zebec.fileProcessor.BlogEntry
 import com.seansoper.zebec.fileProcessor.EventHandler
 import com.seansoper.zebec.fileProcessor.KTML
 import java.io.File
@@ -10,9 +10,6 @@ import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlin.streams.toList
 
 class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
@@ -23,27 +20,6 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
     data class Template(val path: Path, val raw: String, val compiled: String) {
         fun render(content: String): String {
             return compiled.replace("<zebeccontent />", content)
-        }
-    }
-
-    data class Entry(val filePath: Path, val relativePath: String, val createdDate: LocalDateTime, val metadata: BlogEntry.Metadata) {
-        fun html(): String {
-            val image = metadata.image?.let {
-                "<img class='card-img-top' src='${it.previewUrlNormal}' srcset='${it.previewUrlNormal} 1x, ${it.previewUrlRetina} 2x' />"
-            } ?: metadata.imageURL?.let {
-                "<img class='card-img-top' src='${it.relativeProtocol}' />"
-            } ?: ""
-
-            return """
-                <div class='card mb-4'>
-                    $image
-                    <div class='card-body p-3'>
-                      <h5 class='card-title m-0'>${metadata.title}</h5>
-                      <p class='card-text'>${metadata.firstParagraph}</p>
-                      <a href='${relativePath}' class='stretched-link'></a>
-                    </div>
-                  </div>
-            """.trimIndent()
         }
     }
 
@@ -84,13 +60,16 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
             println("${paths.count()} files $suffix")
         }
 
-        var entries = emptyArray<Entry>()
-        val now = Instant.now().atOffset(ZoneOffset.UTC).toLocalDateTime()
+        var entries = emptyArray<BlogEntryMetadata>()
+        var blogPath: Path? = null
 
         paths.forEach { path ->
             val file = WatchFile.ChangedFile(path, extension)
-            val metadata = BlogEntry(this, path, verbose).getMetadata() ?: return@forEach
-            val relativePath = relativeDestinationDir(settings.source, path) ?: return@forEach
+            val metadata = try {
+                BlogEntryMetadata(path)
+            } catch (_: Exception) {
+                return@forEach
+            }
 
             EventHandler(file, settings).process {
                 it?.let {
@@ -98,8 +77,11 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
                         println("Compiled $path to $it")
                     }
 
-                    val createdDate = path.createdDate ?: now
-                    entries += Entry(it, relativePath, createdDate, metadata)
+                    if (blogPath == null) {
+                        blogPath = it
+                    }
+
+                    entries += metadata
                 } ?: run {
                     if (verbose) {
                         println("Failed to compile $path")
@@ -108,12 +90,14 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
             }
         }
 
-        val path = entries.firstOrNull()?.filePath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
+        val relativePath = blogPath?.let { relativeDestinationDir(settings.source, it) } ?: return
+        val indexPath = blogPath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
 
         var count = 0
         var html = "<div class='card-deck mt-4'>"
+
         entries.sortedBy { it.createdDate }.forEach {
-            html += "\n${it.html()}"
+            html += "\n${it.previewHtml(relativePath)}"
             if (++count % 2 == 0) {
                 html += "\n<div class='w-100 d-none d-sm-block d-md-block'></div>"
             }
@@ -122,10 +106,10 @@ class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
         html += "\n</div>"
         val result = template.render(html)
 
-        Files.write(path, result.toByteArray())
+        Files.write(indexPath, result.toByteArray())
 
         if (verbose) {
-            println("Wrote $path with ${entries.count()} entries")
+            println("Wrote $indexPath with ${entries.count()} entries")
         }
     }
 
