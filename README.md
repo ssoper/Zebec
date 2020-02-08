@@ -29,8 +29,8 @@ Static site compiler. Written in Kotlin.
     * ✅ [Unsplash](https://source.unsplash.com/)
     * ✅ Support [srcset](http://thenewcode.com/944/Responsive-Images-For-Retina-Using-srcset-and-the-x-Designator)
     * Social Media [tags](https://blog.hubspot.com/marketing/open-graph-tags-facebook-twitter-linkedin)
-        * [LinkedIn](https://www.linkedin.com/help/linkedin/answer/46687/making-your-website-shareable-on-linkedin)
-        * [Twitter](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
+        * ✅ [LinkedIn](https://www.linkedin.com/help/linkedin/answer/46687/making-your-website-shareable-on-linkedin)
+        * ✅ [Twitter](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
         * Add’l [types](https://ogp.me/#types) such as `article:tag`
         * Add support for [Twitter handle](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
     * Filter entries by category
