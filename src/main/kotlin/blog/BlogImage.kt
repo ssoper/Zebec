@@ -11,6 +11,13 @@ class BlogImage(val imageURL: URL) {
         Preview
     }
 
+    val socialMediaTag: String
+        get() {
+            return unsplashImage?.let {
+                "<meta property='og:image' content='${it.relativeUrl}/1200x627' />"
+            } ?: "<meta property='og:image' content='$imageURL' />"
+        }
+
     init {
         unsplashImage = try {
             UnsplashImage(imageURL)
@@ -30,4 +37,5 @@ class BlogImage(val imageURL: URL) {
             } ?: "src='${imageURL.relativeProtocol}'"
         }
     }
+
 }

@@ -2,6 +2,7 @@ package com.seansoper.zebec.blog
 
 import com.seansoper.zebec.fileProcessor.Markdown
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URL
 import java.nio.file.Files
@@ -16,7 +17,7 @@ import java.util.*
 class InvalidAuthorException: Exception("No author found")
 class InvalidTitleException: Exception("No title found")
 
-class BlogEntryMetadata(val path: Path) {
+class BlogEntryMetadata(val path: Path, val entryURL: URL? = null) {
     val author: String
     val title: String
     val tags: Array<String>
@@ -58,8 +59,32 @@ class BlogEntryMetadata(val path: Path) {
             return result
         }
 
+    val socialMediaMetaTags: String
+        get() {
+            val indentation = " ".repeat(4)
+            var result = ""
+            result += "$indentation<meta name='twitter:card' content='summary' />"
+            result += "\n$indentation<meta property='og:title' content='$title' />"
+
+            entryURL?.let { result += "\n$indentation<meta property='og:url' content='$entryURL' />" }
+            firstParagraph?.let { result += "\n$indentation<meta property='og:description' content='$it' />" }
+            image?.let { result += "\n$indentation${image.socialMediaTag}" }
+
+            return result
+        }
+
     private val Formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US)
     private val TitleRegex = "([a-z0-9]+(([’',. -][a-z0-9 ])?[a-z0-9]*)*)"
+
+    companion object {
+        fun nullable(path: Path, entryURL: URL? = null): BlogEntryMetadata? {
+            return try {
+                BlogEntryMetadata(path, entryURL)
+            } catch (_: FileNotFoundException) {
+                null
+            }
+        }
+    }
 
     init {
         val content = File(path.toString()).readText()

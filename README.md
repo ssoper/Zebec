@@ -32,6 +32,7 @@ Static site compiler. Written in Kotlin.
         * [LinkedIn](https://www.linkedin.com/help/linkedin/answer/46687/making-your-website-shareable-on-linkedin)
         * [Twitter](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
         * Add’l [types](https://ogp.me/#types) such as `article:tag`
+        * Add support for [Twitter handle](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
     * Filter entries by category
     * Add ability to override published date in metadata
 * Generate site files

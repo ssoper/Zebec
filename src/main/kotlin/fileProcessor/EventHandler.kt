@@ -19,6 +19,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
         get() {
             val relativeDestination = changed.path.toString().split(settings.source.toString()).elementAtOrNull(1) ?: return null
             val directory = Paths.get(settings.destination.toString(), relativeDestination)
+
             return File(directory.toString().replace("/./", "/")).parentFile
         }
 
@@ -31,6 +32,27 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
             }
 
             return DocType.getFor(changed.extension)
+        }
+
+    private val destination: Path?
+        get() {
+            val docType = docType ?: return null
+            val filename = changed.path.filenameNoExtension() ?: return null
+            val destinationDirectory = destinationDirectory ?: return null
+
+            return Paths.get(destinationDirectory.toString(), docType.compiledFilename(filename))
+        }
+
+    private val relativeDestination: String?
+        get() {
+            val prefix = changed.path.toString().commonPrefixWith(destination.toString())
+            val path = destination.toString().removePrefix(prefix).replace("/./", "/")
+
+            return if (path.startsWith("/")) {
+                path
+            } else {
+                "/${path}"
+            }
         }
 
     enum class DocType {
@@ -62,40 +84,29 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
     }
 
     fun process(done: (Path?) -> Unit) {
-        val path = processFile { docType, content ->
+        val path = processFile { content ->
             when (docType) {
-                DocType.BlogEntry -> {
-                    settings.blog?.let {
-                        BlogEntry(it, changed.path, settings.verbose).process(content)
-                    } ?: run {
-                        if (settings.verbose) {
-                            println("Could not find blog configurtation")
-                        }
-                        null
-                    }
-                }
+                DocType.BlogEntry -> processBlog(content)
                 DocType.KTML -> KTML(settings.verbose).process(content)
                 DocType.JavaScript -> Script(Script.Type.javascript, settings.verbose).process(content)
                 DocType.Stylesheet -> Script(Script.Type.stylesheet, settings.verbose).process(content)
                 DocType.Markdown -> Markdown().process(content)
+                else -> null
             }
         }
 
         done(path)
     }
 
-    private fun processFile(transform: (docType: DocType, content: String) -> String?): Path? {
-        val docType = docType ?: return null
-        val filename = changed.path.filenameNoExtension() ?: return null
-        val destination = destinationDirectory ?: return null
-        val content = File(changed.path.toString()).readText()
-        val compiled = transform(docType, content) ?: return null
-
-        if (!destination.exists()) {
-            destination.mkdirs()
+    private fun processFile(transform: (content: String) -> String?): Path? {
+        destinationDirectory?.apply {
+            if (!this.exists()) {
+                this.mkdirs()
+            }
         }
 
-        val path = Paths.get(destination.toString(), docType.compiledFilename(filename))
+        val content = File(changed.path.toString()).readText()
+        val compiled = transform(content) ?: return null
 
         if (settings.verbose) {
             val origSize = humanReadableByteCount(content.length)
@@ -103,7 +114,20 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
             println("Compiled ${changed.path.fileName}, $origSize → $newSize")
         }
 
-        Files.write(path, compiled.toByteArray())
-        return path
+        return destination?.let {
+            Files.write(it, compiled.toByteArray())
+            destination
+        }
+    }
+
+    private fun processBlog(content: String): String? {
+        return settings.blog?.let {
+            BlogEntry(it, changed.path, relativeDestination, settings.verbose).process(content)
+        } ?: run {
+            if (settings.verbose) {
+                println("Could not find blog configurtation")
+            }
+            null
+        }
     }
 }

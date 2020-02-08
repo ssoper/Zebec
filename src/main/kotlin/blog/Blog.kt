@@ -12,7 +12,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.streams.toList
 
-class Blog(configuration: BlogConfiguration, val verbose: Boolean = false) {
+class Blog(configuration: BlogConfiguration, val host: String? = null, val verbose: Boolean = false) {
 
     val directory: Path = configuration.directory
     val extension: String = configuration.extension

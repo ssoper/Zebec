@@ -32,6 +32,6 @@ class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
         extensions = configuration.extensions
         host = configuration.host
         verbose = parsed.verbose
-        blog = configuration.blog?.let { Blog(it, verbose) }
+        blog = configuration.blog?.let { Blog(it, host, verbose) }
     }
 }
