@@ -44,7 +44,7 @@ class BlogEntryMetadata(val path: Path, val entryURL: URL? = null) {
 
             result += """
                     <div class='author'>
-                      <img src='/images/avatar.jpg' alt='' />
+                      <img src='/images/avatar_normal.jpg' alt='' srcset='/images/avatar_normal.jpg 1x, /images/avatar_retina.jpg 2x'/>
                       <ul>
                         <li>$author</li>
                         <li>${createdDate.format(Formatter)}</li>
