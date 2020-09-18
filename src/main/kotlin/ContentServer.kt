@@ -32,9 +32,7 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
     }
 
     fun start() {
-        if (verbose) {
-            println("Serving $basePath at localhost:$port")
-        }
+        println("Serving $basePath at localhost:$port")
 
         HttpServer.create(InetSocketAddress(port), 0).apply {
             createContext("/", handler)
