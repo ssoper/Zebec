@@ -40,3 +40,7 @@ Static site compiler. Written in Kotlin.
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
 * Generate shields.io badges (examples: w3c validation, link backs, etc.)
 * Saved state of compiled files via local database (SQL file)
+
+## Questions?
+
+Try the [troubleshooting](troubleshooting.md) documentation first. You can also [create an issue](https://github.com/ssoper/Zebec/issues). 
