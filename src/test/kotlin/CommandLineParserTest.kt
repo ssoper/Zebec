@@ -18,7 +18,7 @@ class CommandLineParserTest: StringSpec({
 
     "verbose is set to true" {
         println(source)
-        val parser = CommandLineParser(arrayOf("-verbose=true", source))
+        val parser = CommandLineParser(arrayOf("-verbose", source))
         parser.parse().verbose.shouldBeTrue()
     }
 

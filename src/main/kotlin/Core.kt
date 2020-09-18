@@ -53,10 +53,8 @@ object Core {
 
         val channel = watch.createChannel()
 
-        if (settings.verbose) {
-            watch.paths.forEach { println("Watching $it") }
-            println("Filtering on files with extensions ${settings.extensions.joinToString()}")
-        }
+        watch.paths.forEach { println("Watching $it") }
+        println("Filtering on files with extensions ${settings.extensions.joinToString()}")
 
         while (true) {
             val changed = channel.receive()

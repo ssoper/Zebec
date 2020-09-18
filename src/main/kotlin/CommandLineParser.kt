@@ -9,6 +9,8 @@ class CommandLineParser(private val args: Array<String>,
                         private val basePath: String = System.getProperty("user.dir")) {
 
     val shouldShowHelp: Boolean = args.any { it == "-help" }
+    val verbose: Boolean = args.any { it == "-verbose" }
+    val recompile: Boolean = args.any { it == "-recompile" }
 
     data class Parsed(val pathToConfigFile: Path,
                       val verbose: Boolean,
@@ -18,10 +20,10 @@ class CommandLineParser(private val args: Array<String>,
         val str = """
             Arguments
 
-                -help                   Show documentation
-                -config=path            Path to configuration file, default is ./zebec.config
-                -recompile=true         Recompile the files instead of running the service
-                -verbose=true           Show debugging output, default is false
+                -help              Show documentation
+                -verbose           Show debugging output
+                -recompile         Recompile the files instead of running the service
+                -config=path       Path to configuration file, default is ./zebec.config
         """.trimIndent()
         println(str)
     }
@@ -32,9 +34,6 @@ class CommandLineParser(private val args: Array<String>,
         if (!File(pathToConfigFile.toString()).exists()) {
             throw ConfigFileNotFound()
         }
-
-        val verbose = getVerbose()
-        val recompile = getRecompile()
 
         return Parsed(pathToConfigFile, verbose, recompile)
     }
@@ -55,11 +54,6 @@ class CommandLineParser(private val args: Array<String>,
         return args.mapNotNull(match)
     }
 
-    private fun getVerbose(): Boolean {
-        val regex = Regex("^-verbose=(\\w+)")
-        return parseArguments(regex) { it == "true" }.isNotEmpty()
-    }
-
     private fun getPath(type: String): Path? {
         val regex = Regex("^-${type}=(.*)")
 
@@ -70,11 +64,6 @@ class CommandLineParser(private val args: Array<String>,
                 Paths.get(basePath, it)
             }
         }.firstOrNull()
-    }
-
-    private fun getRecompile(): Boolean {
-        val regex = Regex("^-recompile=(\\w+)")
-        return parseArguments(regex) { it == "true" }.isNotEmpty()
     }
 
 }
