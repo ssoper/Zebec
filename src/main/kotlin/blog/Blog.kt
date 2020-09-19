@@ -58,7 +58,11 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
             val file = WatchFile.ChangedFile(path, extension)
             val metadata = try {
                 BlogEntryMetadata(path)
-            } catch (_: Exception) {
+            } catch (exception: Exception) {
+                if (verbose) {
+                    println("Failed to compile $path, $exception")
+                }
+
                 return@forEach
             }
 
