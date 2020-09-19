@@ -88,7 +88,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         var count = 0
         var html = "<div class='card-deck mt-4'>"
 
-        entries.sortedBy { it.createdDate }.forEach { metadata ->
+        entries.sortedBy { it.createdDate }.reversed().forEach { metadata ->
             val relativePath = compiledBlogPath?.let { relativePath(settings.source, it) } ?: return@forEach
             html += "\n${metadata.previewHtml(relativePath)}"
             if (++count % 2 == 0) {
