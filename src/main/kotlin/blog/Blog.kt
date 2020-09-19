@@ -5,6 +5,7 @@ import com.seansoper.zebec.configuration.BlogConfiguration
 import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.EventHandler
 import com.seansoper.zebec.fileProcessor.KTML
+import com.seansoper.zebec.filenameNoExtension
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
@@ -38,7 +39,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         }
     }
 
-    // TODO: Remove dependence on having HTML code mixed with Kotlin
+    // TODO: Remove dependence on having HTML code mixed with Kotlin (could have a template file, path in config)
     // TODO: Break up into smaller components
     fun recompile(settings: Settings) {
         val paths = getPaths()
@@ -73,7 +74,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
                     }
 
                     if (compiledBlogPath == null) {
-                        compiledBlogPath = it
+                        compiledBlogPath = it.parent
                     }
 
                     entries += metadata
@@ -89,7 +90,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         var html = "<div class='card-deck mt-4'>"
 
         entries.sortedBy { it.createdDate }.reversed().forEach { metadata ->
-            val relativePath = compiledBlogPath?.let { relativePath(settings.source, it) } ?: return@forEach
+            val relativePath = compiledBlogPath?.let { relativePath(settings.source, it, metadata.path.fileName) } ?: return@forEach
             html += "\n${metadata.previewHtml(relativePath)}"
             if (++count % 2 == 0) {
                 html += "\n<div class='w-100 d-none d-sm-block d-md-block'></div>"
@@ -99,7 +100,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         html += "\n</div>"
 
         val result = template.render(html)
-        val indexPath = compiledBlogPath?.let { Paths.get(it.parent.toString(), "index.html") } ?: return
+        val indexPath = compiledBlogPath?.let { Paths.get(it.toString(), "index.html") } ?: return
         Files.write(indexPath, result.toByteArray())
 
         if (verbose) {
@@ -115,14 +116,14 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
     }
 
     // TODO: This shares some functionality with EventHandler.processFile, consider consolidating
-    private fun relativePath(source: Path, compiledBlogPath: Path): String? {
+    private fun relativePath(source: Path, compiledBlogPath: Path, filename: Path): String? {
         val prefix = source.toString().commonPrefixWith(compiledBlogPath.toString())
         val path = compiledBlogPath.toString().removePrefix(prefix).replace("/./", "/")
 
         return if (path.startsWith("/")) {
-            path
+            "${path}/${filename.filenameNoExtension()}.html"
         } else {
-            "/${path}"
+            "/${path}/${filename.filenameNoExtension()}.html"
         }
     }
 
