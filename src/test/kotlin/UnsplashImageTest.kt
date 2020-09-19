@@ -8,10 +8,10 @@ import java.net.URL
 class UnsplashImageTest: StringSpec({
 
     "valid" {
-        val url = "https://unsplash.com/photos/ZBWtD2UmMzA"
+        val url = "https://unsplash.com/photos/ZBWtD2Um_MzA"
         val result = UnsplashImage(URL(url))
-        result.photoId.shouldBe("ZBWtD2UmMzA")
-        result.entryUrlNormal.shouldBe("//source.unsplash.com/ZBWtD2UmMzA/900x300")
+        result.photoId.shouldBe("ZBWtD2Um_MzA")
+        result.entryUrlNormal.shouldBe("//source.unsplash.com/ZBWtD2Um_MzA/900x300")
     }
 
     "trailing slash" {
