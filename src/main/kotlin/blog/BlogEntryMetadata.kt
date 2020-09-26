@@ -74,7 +74,7 @@ class BlogEntryMetadata(val path: Path, val entryURL: URL? = null) {
         }
 
     private val Formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.US)
-    private val TitleRegex = "([a-z0-9]+(([’',. -*][a-z0-9 ])?[a-z0-9]*)*)"
+    private val TitleRegex = "([a-z0-9]+(([’',. \\-*][a-z0-9 ])?[a-z0-9]*)*)"
 
     companion object {
         fun nullable(path: Path, entryURL: URL? = null): BlogEntryMetadata? {
