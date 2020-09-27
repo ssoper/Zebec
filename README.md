@@ -35,6 +35,7 @@ Static site compiler. Written in Kotlin.
         * Add support for [Twitter handle](https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started)
     * Filter entries by category
     * Add ability to override published date in metadata
+    * RSS
 * Generate site files
     * [robots.txt](https://support.google.com/webmasters/answer/6062596?hl=en&ref_topic=6061961)
     * [sitemap](https://support.google.com/webmasters/answer/183668?hl=en&ref_topic=4581190)
