@@ -19,7 +19,7 @@ class ContentServerTest: StringSpec({
     "jpg content type" {
         val result = ContentServer.ContentType.valueOf("jpg")
         result.shouldBe(ContentServer.ContentType.jpg)
-        result.type.shouldBe("application/jpeg")
+        result.type.shouldBe("image/jpeg")
         result.isBinary().shouldBeTrue()
     }
 
