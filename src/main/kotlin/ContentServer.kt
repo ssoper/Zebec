@@ -17,8 +17,9 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
         css("text/css"),
         js("text/javascript"),
         otf("font/otf"),
-        jpg("application/jpeg"),
-        png("application/png"),
+        jpg("image/jpeg"),
+        png("image/png"),
+        webp("image/webp"),
         ico("image/vnd.microsoft.icon"),
         unknown("application/octet-stream");
 
@@ -122,8 +123,15 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
 
         parse(it.requestURI, logger)?.let { response ->
             it.responseHeaders.add("Content-Type", response.contentType.type)
-            it.sendResponseHeaders(200, 0)
-            response.serve(it.responseBody)
+            it.responseHeaders.add("Accept-Ranges", "bytes")
+            it.sendResponseHeaders(200, response.fileSize.toLong())
+
+            logger?.add("Size: ${Utilities.humanReadableByteCount(response.fileSize)} (binary)")
+            it.responseBody.write(response.file.readBytes())
+            it.responseBody.close()
+            logger?.close()
+
+            it.requestBody.close()
         } ?: run {
             it.responseHeaders.add("Content-Type", "text/plain")
             it.sendResponseHeaders(404, 0)

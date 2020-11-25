@@ -6,6 +6,10 @@ import java.io.PrintWriter
 
 class ContentResponse(val file: File, val contentType: ContentServer.ContentType, val logger: ContentServer.RequestLogger?) {
 
+    val fileSize: Int by lazy {
+        file.readBytes().size
+    }
+
     fun serve(stream: OutputStream) {
         logger?.add("Content-Type: ${contentType.type}")
 
@@ -16,10 +20,10 @@ class ContentResponse(val file: File, val contentType: ContentServer.ContentType
         }
     }
 
+    // TODO: No one is using this, remove and streamline
     private fun serveBinary(stream: OutputStream) {
-        val bytes = file.readBytes()
-        logger?.add("Size: ${Utilities.humanReadableByteCount(bytes.size)} (binary)")
-        stream.write(bytes)
+        logger?.add("Size: ${Utilities.humanReadableByteCount(fileSize)} (binary)")
+        stream.write(file.readBytes())
         stream.close()
         logger?.close()
     }
