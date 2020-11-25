@@ -148,7 +148,7 @@ class KTMLParser {
         fun body(init: Body.() -> Unit) = initTag(Body(), init)
     }
 
-    class Head : Tag("head"), SupportsLinkTag {
+    class Head : Tag("head"), SupportsLinkTag, SupportsScriptTag {
         fun title(text: String) = addTag(TagWithText("title", text))
         fun meta(attributes: TagAttributes) = addTag(TagSelfClosing("meta", attributes))
         fun comment(comment: String) = addTag(TagComment(comment))
@@ -158,6 +158,12 @@ class KTMLParser {
         fun link(relType: LinkRelType, attributes: TagAttributes) {
             linkTag(relType, attributes) {
                 addTag(TagSelfClosing("link", it))
+            }
+        }
+
+        fun script(src: String) {
+            scriptTag(src) {
+                addTag(TagWithText("script", "", it))
             }
         }
     }
