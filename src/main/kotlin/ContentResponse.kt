@@ -10,6 +10,7 @@ class ContentResponse(val file: File, val contentType: ContentServer.ContentType
         file.readBytes().size
     }
 
+    // TODO: No one is using anything from here below. Remove, update tests and streamline
     fun serve(stream: OutputStream) {
         logger?.add("Content-Type: ${contentType.type}")
 
@@ -20,7 +21,6 @@ class ContentResponse(val file: File, val contentType: ContentServer.ContentType
         }
     }
 
-    // TODO: No one is using this, remove and streamline
     private fun serveBinary(stream: OutputStream) {
         logger?.add("Size: ${Utilities.humanReadableByteCount(fileSize)} (binary)")
         stream.write(file.readBytes())
