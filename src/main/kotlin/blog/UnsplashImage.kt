@@ -39,7 +39,7 @@ class UnsplashImage(imageURL: URL) {
             path = path.substringBeforeLast("/")
         }
 
-        photoId = path.split("/").lastOrNull()?.let { Regex("[0-9a-zA-Z_?]+").matchEntire(it)?.value }
+        photoId = path.split("/").lastOrNull()?.let { Regex("[0-9a-zA-Z_\\-?]+").matchEntire(it)?.value }
             ?: throw InvalidUnsplashURL()
     }
 
