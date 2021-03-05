@@ -6,7 +6,7 @@ import java.io.File
 import java.nio.file.Path
 import javax.script.ScriptEngineManager
 
-class Settings(parsed: CommandLineParser.Parsed, basePath: String) {
+class Settings(parsed: CommandLineParser.Parsed, val basePath: String) {
 
     val source: Path
     val destination: Path

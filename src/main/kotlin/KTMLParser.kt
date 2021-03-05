@@ -23,7 +23,8 @@ class KTMLParser {
 
     enum class LinkRelType(val value: String) {
         Shortcut("shortcut icon"),
-        Stylesheet("stylesheet")
+        Stylesheet("stylesheet"),
+        Alternate("alternate")
     }
 
     interface SupportsLinkTag {

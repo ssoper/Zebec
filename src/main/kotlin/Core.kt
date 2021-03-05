@@ -35,7 +35,11 @@ object Core {
             blog.recompile(settings)
 
             val serializer = Serializer(settings)
-            serializer.generateFeed()
+            if (serializer.generateFeed()) {
+                println("Successfully wrote RSS file")
+            } else {
+                println("Failed to write RSS file")
+            }
 
             exitProcess(0)
         }

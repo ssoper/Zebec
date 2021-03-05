@@ -39,7 +39,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         }
     }
 
-    fun getEntries(settings: Settings): List<BlogEntryMetadata>? {
+    fun getEntries(): List<BlogEntryMetadata>? {
         val paths = getPaths()
 
         if (verbose) {
