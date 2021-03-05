@@ -26,6 +26,7 @@
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.11.2/8f3be3a394bb8511a0460794a98dcd0d64989e5d/jackson-module-jaxb-annotations-2.11.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.module/jackson-module-kotlin/2.11.2/470e6cb1482e883ed006817bae7bb143ad75b8c0/jackson-module-kotlin-2.11.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fasterxml.woodstox/woodstox-core/6.2.1/1600925b1ec7c7a3403c8f068ad62feead13132f/woodstox-core-6.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.woodstox/stax2-api/4.2.1/a3f7325c52240418c2ba257b103c3c550e140c83/stax2-api-4.2.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

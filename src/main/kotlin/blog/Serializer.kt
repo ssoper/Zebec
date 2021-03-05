@@ -3,16 +3,17 @@ package com.seansoper.zebec.blog
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonSerializer
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.seansoper.zebec.blog.rss.Channel
+import com.seansoper.zebec.blog.rss.Feed
 import com.seansoper.zebec.configuration.Settings
 import java.io.IOException
 import java.net.URL
-import java.text.SimpleDateFormat
-import java.time.Instant
 import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 import java.util.*
 
@@ -38,13 +39,19 @@ class Serializer(private val settings: Settings) {
 
         // TODO: Add title and description to blog configuration
         val channel = Channel("eat. code. stonks.", URL("https://$host/blog"), "a blog")
-        val mapper = ObjectMapper()
+        val feed = Feed(channel)
+        val mapper = XmlMapper(JacksonXmlModule().apply {
+            setDefaultUseWrapper(false)
+        }).apply {
+            enable(SerializationFeature.INDENT_OUTPUT)
+        }
+
         val module = SimpleModule()
         module.addSerializer(GregorianCalendar::class.java, DateEncoder())
         mapper.registerModule(module)
         mapper.registerModule(KotlinModule())
 
-        val serialized = mapper.writeValueAsString(channel)
+        val serialized = mapper.writeValueAsString(feed)
         println(serialized)
 
         return true

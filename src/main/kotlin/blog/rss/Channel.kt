@@ -2,9 +2,11 @@ package com.seansoper.zebec.blog.rss
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 import java.net.URL
 import java.util.*
 
+@JacksonXmlRootElement(localName = "channel")
 data class Channel(
     val title: String,
     val link: URL,
