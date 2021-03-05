@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.seansoper.zebec.blog.Serializer
 import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
@@ -32,6 +33,10 @@ object Core {
             }
 
             blog.recompile(settings)
+
+            val serializer = Serializer(settings)
+            serializer.generateFeed()
+
             exitProcess(0)
         }
 

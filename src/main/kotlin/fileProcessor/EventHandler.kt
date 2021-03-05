@@ -34,7 +34,7 @@ class EventHandler(val changed: WatchFile.ChangedFile, val settings: Settings) {
             return DocType.getFor(changed.extension)
         }
 
-    private val destination: Path?
+    val destination: Path?
         get() {
             val docType = docType ?: return null
             val filename = changed.path.filenameNoExtension() ?: return null

@@ -20,6 +20,8 @@ dependencies {
     implementation( "org.jetbrains.kotlin:kotlin-script-runtime:$jsr223WorkingVersion")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$jsr223WorkingVersion")
     implementation("org.jetbrains.kotlin:kotlin-script-util:$jsr223WorkingVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2")
     compile(files("src/main/libs/yuicompressor-2.4.8.jar"))
     compile(files("src/main/libs/markdown-0.1.41.jar"))
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")

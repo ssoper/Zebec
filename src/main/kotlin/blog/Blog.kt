@@ -39,8 +39,40 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
         }
     }
 
+    fun getEntries(settings: Settings): List<BlogEntryMetadata>? {
+        val paths = getPaths()
+
+        if (verbose) {
+            println("Found ${paths.count()} files in $directory with extension $extension")
+        }
+
+        if (paths.count() < 1) {
+            return null
+        }
+
+        return paths.mapNotNull { path ->
+            try {
+                BlogEntryMetadata(path)
+            } catch (exception: Exception) {
+                if (verbose) {
+                    println("Failed to compile $path, $exception")
+                }
+
+                null
+            }
+        }
+    }
+
+    fun getEntryPath(entry: BlogEntryMetadata, settings: Settings): Path? {
+        val file = WatchFile.ChangedFile(entry.path, extension)
+        val handler = EventHandler(file, settings)
+
+        return handler.destination
+    }
+
     // TODO: Remove dependence on having HTML code mixed with Kotlin (could have a template file, path in config)
-    // TODO: Break up into smaller components
+    // TODO: Break up into smaller components (see getEntries)
+
     fun recompile(settings: Settings) {
         val paths = getPaths()
 
