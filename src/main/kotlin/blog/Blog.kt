@@ -71,8 +71,7 @@ class Blog(configuration: BlogConfiguration, val host: String? = null, val verbo
     }
 
     // TODO: Remove dependence on having HTML code mixed with Kotlin (could have a template file, path in config)
-    // TODO: Break up into smaller components (see getEntries)
-
+    // TODO: Break up into smaller components (see getEntries and getEntryPath)
     fun recompile(settings: Settings) {
         val paths = getPaths()
 

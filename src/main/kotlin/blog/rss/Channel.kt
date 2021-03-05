@@ -15,8 +15,21 @@ data class Channel(
     val lastBuildDate: GregorianCalendar = GregorianCalendar(),
     val generator: String = "zebec",
     val docs: String = "http://blogs.law.harvard.edu/tech/rss",
+    @JacksonXmlProperty(localName = "atom:link")
+    val atom: Atom = Atom(URL("$link/rss.xml")),
 
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "item")
     val items: List<Entry> = emptyList()
+)
+
+data class Atom(
+    @field:JacksonXmlProperty(isAttribute = true)
+    val href: URL,
+
+    @field:JacksonXmlProperty(isAttribute = true)
+    val rel: String = "self",
+
+    @field:JacksonXmlProperty(isAttribute = true)
+    val type: String = "application/rss+xml"
 )
