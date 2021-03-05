@@ -16,6 +16,7 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
         html("text/html"),
         css("text/css"),
         js("text/javascript"),
+        xml("text/xml"),
         otf("font/otf"),
         jpg("image/jpeg"),
         png("image/png"),
