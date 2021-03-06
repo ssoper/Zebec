@@ -48,9 +48,9 @@ class Serializer(private val settings: Settings) {
         val relPath = "/blog"
         val writePath = "$basePath/$relPath/rss.xml"
 
-        // TODO: Add title and description to blog configuration
+        // TODO: Add title and description to blog configuration and use here
         // TODO: URL path should come from config, difference between src and blog.directory. Or change config so that blog source is configure.src + blog.directory
-        val channel = Channel("eat. code. stonks.", URL("https://$host$relPath"), "Writing code for its own sake", items = entries)
+        val channel = Channel("eat. code. stocks.", URL("https://$host$relPath"), "Writing code for its own sake", items = entries)
 
         val feed = Feed(channel)
         val mapper = XmlMapper(JacksonXmlModule().apply {
