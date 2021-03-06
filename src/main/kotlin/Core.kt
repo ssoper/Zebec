@@ -1,5 +1,6 @@
 package com.seansoper.zebec
 
+import com.seansoper.zebec.blog.Serializer
 import com.seansoper.zebec.configuration.Settings
 import com.seansoper.zebec.fileProcessor.EventHandler
 import kotlinx.coroutines.runBlocking
@@ -32,6 +33,14 @@ object Core {
             }
 
             blog.recompile(settings)
+
+            val serializer = Serializer(settings)
+            if (serializer.generateFeed()) {
+                println("Successfully wrote RSS file")
+            } else {
+                println("Failed to write RSS file")
+            }
+
             exitProcess(0)
         }
 

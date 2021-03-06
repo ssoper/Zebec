@@ -16,6 +16,7 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
         html("text/html"),
         css("text/css"),
         js("text/javascript"),
+        xml("text/xml"),
         otf("font/otf"),
         jpg("image/jpeg"),
         png("image/png"),
@@ -131,6 +132,8 @@ class ContentServer(path: Path, val port: Int, val verbose: Boolean) {
         }
 
         it.responseHeaders.add("Cache-Control", "no-cache")
+
+        // TODO: Make this some sort of global and use it in rss/generator
         it.responseHeaders.add("via", "zebec 1.0")
 
         parse(it.requestURI, logger)?.let { response ->

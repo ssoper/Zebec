@@ -25,6 +25,7 @@ class BlogEntryMetadata(val path: Path, val entryURL: URL? = null) {
     val subtitle: String?
     val firstParagraph: String?
 
+    // TODO: Consider standardizing on GregorianCalendar
     val createdDate: LocalDateTime
         get() {
             return try {
