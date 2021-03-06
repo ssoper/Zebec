@@ -270,13 +270,13 @@ class KTMLParser {
     class GoogleAnalyticsTag(val site: String) : Element("script") {
         override fun render(indent: Int): String {
             val indentation = " ".repeat(indent)
-            return "$indentation<script>\n" +
-                    "$indentation(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n" +
-                    "$indentation(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n" +
-                    "${indentation}m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n" +
-                    "$indentation})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');\n" +
-                    "${indentation}if (typeof(ga) === 'function') { ga('create', '$site', 'auto'); ga('send', 'pageview'); }\n" +
-                    "$indentation</script>"
+            return "${indentation}<script async src='https://www.googletagmanager.com/gtag/js?id=${site}'></script>\n" +
+                   "${indentation}<script>\n" +
+                   "${indentation}window.dataLayer = window.dataLayer || [];\n" +
+                   "${indentation}function gtag(){dataLayer.push(arguments);}\n" +
+                   "${indentation}gtag('js', new Date());\n" +
+                   "${indentation}gtag('config', '${site}');\n" +
+                   "${indentation}</script>"
         }
     }
 
