@@ -1,6 +1,5 @@
 package com.seansoper.zebec.fileProcessor
 
-import org.intellij.markdown.IElementType
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.ast.findChildOfType
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
