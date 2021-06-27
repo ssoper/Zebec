@@ -10,7 +10,8 @@ class KTML(val verbose: Boolean): Processable {
         val engine = ScriptEngineManager().getEngineByExtension("kts")
 
         // Because bindings are wonky
-        val updatedContent = "import com.seansoper.zebec.KTMLParser\n$content".replace("html ", "KTMLParser().html ")
+        val updatedContent = "import com.seansoper.zebec.KTMLParser\n$content"
+            .replace("html ", "KTMLParser().html ")
             .replace("LinkRelType", "KTMLParser.LinkRelType")
 
         return try {
