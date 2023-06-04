@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          java-version: '11.0.4'
+          java-version: 17
           distribution: zulu
 
       - name: Run tests
@@ -23,11 +23,11 @@ jobs:
           ./gradlew test
           ./gradlew jacocoTestReport
 
-      - name: Upload coverage to gist
-        run: |
-          ./gradlew parseJacocoReport
-          ./gradlew createGistPayload
-          curl -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
-               -H "Content-Type: application/json" \
-               -X PATCH \
-               --data @build/gist.json https://api.github.com/gists/2741eb65fdb9bdee723e50d7648294ed
+      - name: Generate coverage report
+        run: ./gradlew jacocoTestReport
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/jacoco/report.xml

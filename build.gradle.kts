@@ -2,15 +2,23 @@ import java.io.FileInputStream
 import java.lang.Integer.min
 import java.util.*
 
+val javaVersion = JavaVersion.VERSION_17
+val jsr223WorkingVersion = "1.3.21"
+
 plugins {
-    kotlin("jvm") version "1.5.30"
+    kotlin("jvm") version "1.8.21"
+    id("jacoco")
+}
+
+allprojects {
+    jacoco {
+        toolVersion = "0.8.7"
+    }
 }
 
 repositories {
     mavenCentral()
 }
-
-val jsr223WorkingVersion = "1.3.21"
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -25,18 +33,22 @@ dependencies {
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.0")
 }
 
+java {
+    targetCompatibility = javaVersion
+    sourceCompatibility = javaVersion
+}
+
 tasks.compileKotlin {
-    this.kotlinOptions.jvmTarget = "1.8"
+    this.kotlinOptions.jvmTarget = javaVersion.toString()
 }
 
 tasks.compileTestKotlin {
-    this.kotlinOptions.jvmTarget = "1.8"
+    this.kotlinOptions.jvmTarget = javaVersion.toString()
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
-
 
 tasks.register<Jar>("fatJar") {
     description = "Create an executable JAR with a command-line client"
@@ -51,4 +63,13 @@ tasks.register<Jar>("fatJar") {
         configurations.runtimeClasspath.get()
             .filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
+}
+
+tasks.jacocoTestReport {
+    executionData("$buildDir/jacoco/test.exec")
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = true
+        xml.destination = File("$buildDir/reports/jacoco/report.xml")
+    }
 }
