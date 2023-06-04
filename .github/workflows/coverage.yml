@@ -1,20 +1,28 @@
-name: tests
-on: [push]
+name: Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
 jobs:
-  run:
-    runs-on: macos-latest
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
-      - name: Setup Java  
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@main
+
+      - uses: actions/setup-java@v3
         with:
           java-version: '11.0.4'
-          java-package: jdk
+          distribution: zulu
+
       - name: Run tests
         run: |
           ./gradlew test
           ./gradlew jacocoTestReport
+
       - name: Upload coverage to gist
         run: |
           ./gradlew parseJacocoReport
