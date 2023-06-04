@@ -19,9 +19,7 @@ jobs:
           distribution: zulu
 
       - name: Run tests
-        run: |
-          ./gradlew test
-          ./gradlew jacocoTestReport
+        run: ./gradlew test
 
       - name: Generate coverage report
         run: ./gradlew jacocoTestReport
