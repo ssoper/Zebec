@@ -1,7 +1,7 @@
 <p align="center"><img src="https://github.com/ssoper/Zebec/raw/main/gh/zebec.png" alt="Zebec Logo"></p>
 
 [![tests](https://github.com/ssoper/Zebec/actions/workflows/coverage.yml/badge.svg)](https://github.com/ssoper/Zebec/actions/workflows/coverage.yml)
-[![codecov](https://codecov.io/gh/ssoper/Zebec/branch/master/graph/badge.svg?token=HU5CYI3X3X)](https://codecov.io/gh/ssoper/Zebec)
+[![codecov](https://codecov.io/gh/ssoper/Zebec/branch/main/graph/badge.svg?token=HU5CYI3X3X)](https://codecov.io/gh/ssoper/Zebec)
 [![Download](https://img.shields.io/badge/download-v1.0.1-blue)](https://github.com/ssoper/Zebec/packages/108070)
 [![License](https://img.shields.io/github/license/ssoper/Zebec)](https://github.com/ssoper/Zebec/blob/master/LICENSE)
 
